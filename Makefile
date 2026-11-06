@@ -6,6 +6,7 @@ PYTHON ?= python3
 RTL = rtl/branch_history_table.v rtl/predictor_2bit.v rtl/predictor_1bit.v rtl/predictor_top.v
 P3_RTL = rtl/next_pc_mux.v rtl/branch_resolution.v
 P4_ALL_RTL = $(RTL) rtl/branch_target_buffer.v $(P3_RTL)
+BPU_RTL = rtl/branch_history_table.v rtl/predictor_2bit.v rtl/branch_target_buffer.v $(P3_RTL) rtl/branch_prediction_unit.v
 
 .PHONY: help test test-p1 test-p1-extended test-p1-scoreboard verify-p1 demo synth-p1 synth-p1-checked clean
 .PHONY: test-p3 test-p3-integrated verify-p3 synth-p3-checked
@@ -19,7 +20,7 @@ metrics: test-p4-compare
 test-p5-metrics:
 	$(PYTHON) -m unittest discover -s tests -p 'test_metrics.py' -v
 
-test: test-p1 test-p1-extended test-p1-scoreboard demo test-btb test-p3 test-p3-integrated test-p4
+test: test-p1 test-p1-extended test-p1-scoreboard demo test-btb test-p3 test-p3-integrated test-p4 test-bpu
 
 test-p1:
 	@mkdir -p results
@@ -48,13 +49,14 @@ clean:
 		results/p3_synthesis_checked.log \
 		results/p4_comparison_sim results/p4_comparison.vcd results/p4_comparison_test.log \
 		results/p4_predictor_test.log results/p4_synthesis_checked.log \
-		results/p4_verilog_summary.csv results/p4_python_summary.csv
+		results/p4_verilog_summary.csv results/p4_python_summary.csv \
+		results/bpu_sim_4 results/bpu_sim_5 results/bpu_integration.vcd results/bpu_test_4.log results/bpu_test_5.log
 
 help:
 	@echo "Core checks: make test-p1, make test-p1-extended, make demo, make synth-p1"
 	@echo "P3 checks:   make test-p3, make test-p3-integrated, make verify-p3"
 	@echo "P4 checks:   make check-traces, make test-p4-unit, make test-p4-comparison, make test-p4-oracle, make test-p4-compare, make verify-p4"
-	@echo "make test runs directed, extended, independent scoreboard, demo, P3, and P4 tests"
+	@echo "make test runs P1-P4, BTB, BPU integration, and demo tests"
 	@echo "make verify-p1 adds checked generic synthesis to all P1 tests"
 	@echo "make verify-p3 adds checked generic synthesis to all P3 tests"
 	@echo "make verify-p4 adds checked generic synthesis to all P4 tests"
@@ -174,3 +176,14 @@ verify-p4: test-p4 synth-p4-checked waveform-p4
 .PHONY: synth-all
 synth-all:
 	YOSYS="$(YOSYS)" PYTHON="$(PYTHON)" bash scripts/synth_all.sh
+
+# Final integrated branch-prediction subsystem.
+.PHONY: test-bpu
+test-bpu:
+	@mkdir -p results
+	@set -euo pipefail; for bits in 4 5; do \
+	  $(IVERILOG) -g2012 -Wall -s tb_branch_prediction_unit \
+	    -Ptb_branch_prediction_unit.INDEX_BITS=$$bits \
+	    -o results/bpu_sim_$$bits $(BPU_RTL) testbench/tb_branch_prediction_unit.sv; \
+	  $(VVP) results/bpu_sim_$$bits | tee results/bpu_test_$$bits.log; \
+	done

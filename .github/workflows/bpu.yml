@@ -1,0 +1,26 @@
+name: BPU integrated hardware verification
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  bpu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Icarus Verilog
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends iverilog
+      - name: Run 16/32-entry BPU integration regression
+        run: make test-bpu
+      - name: Upload failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bpu-failure-logs
+          path: |
+            results/bpu_integration.vcd
+            results/bpu_test_*.log
+          if-no-files-found: ignore

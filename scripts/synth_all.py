@@ -9,7 +9,7 @@ from pathlib import Path
 import subprocess
 
 TOPS = ("predictor_2bit", "predictor_1bit", "branch_target_buffer",
-        "next_pc_mux", "branch_resolution", "predictor_top")
+        "next_pc_mux", "branch_resolution", "predictor_top", "branch_prediction_unit")
 
 
 def main():
@@ -52,13 +52,13 @@ def main():
     lines = ["# P5 generic synthesis evidence", "", f"Tool: `{version}`.", "",
              "Command: `make synth-all`. Each top runs in a separate Yosys process with",
              "`hierarchy -check`, `synth -flatten`, `check -assert`, and default RTL parameters.",
-             "All six synthesis/check commands succeeded in this run.", "",
+             f"All {len(TOPS)} synthesis/check commands succeeded in this run.", "",
              "| RTL top | Generic cells after flattening |", "| --- | ---: |"]
     lines += [f"| `{top}` | {count} |" for top, count, _ in rows]
     lines += ["", "These are generic logic/register cells, not FPGA LUT counts. No device, clock",
               "constraint, placement/routing or timing analysis is included; maximum MHz is unmeasured.",
               "Counts are not additive across tops. `predictor_top` combines direction predictors only;",
-              "P1/P2/P3 integration is currently a simulation testbench, not a synthesizable CPU top.",
+              "`branch_prediction_unit` integrates BHT/BTB/recovery RTL but is not a complete CPU.",
               "", f"Raw logs, netlists, tool version, per-type counts and RTL SHA-256 hashes: `{args.output_dir}/`.",
               "Generated results are ignored by Git; reproduce locally or download the CI artifact.", ""]
     args.summary.parent.mkdir(parents=True, exist_ok=True)

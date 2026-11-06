@@ -1,10 +1,13 @@
-# P5 generic synthesis evidence
+# P5 generic synthesis evidence — six-top baseline (5 November 2026)
 
 Tool: `Yosys 0.70+post (git sha1 0c11ea098be065e585a90a06e7b7da49936cf231, Release, AppleClang clang++ 21.0.0.21000334)`.
 
 Command: `make synth-all`. Each top runs in a separate Yosys process with
 `hierarchy -check`, `synth -flatten`, `check -assert`, and default RTL parameters.
-All six synthesis/check commands succeeded in this run.
+All six original synthesis/check commands succeeded in this run.
+
+> Historical evidence from before the integrated wrapper. Regenerate the current
+> **seven-top** synthesis evidence with `make synth-all`; do not invent new counts.
 
 | RTL top | Generic cells after flattening |
 | --- | ---: |
