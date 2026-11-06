@@ -86,5 +86,4 @@ Until the team chooses the target, ask the leader to confirm with faculty whethe
 the explicitly disclosed unmeasured-Fmax limitation is acceptable. Do not choose
 an arbitrary part merely to generate a MHz number.
 
-The six-top summary dated 5 November predates this wrapper. After this PR
-merges, run `make synth-all` to collect a verified seven-top generic report.
+The seven-top flow passed on QA commit `e0122ef` in [CI run 42200408851](https://github.com/S-h-u-b-h-1/MCA/actions/runs/42200408851). Its uploaded artifact (logs, JSON netlists and manifest) was inspected: all seven netlist cell totals match the manifest, and source hashes cover all eight RTL files. The committed summary reproduces Yosys 0.33 results from that CI run. Older six-top Mac results used Yosys 0.70+post and remain historical; different versions can yield different generic cell counts. Run `make synth-all` again on merged main and preserve its own tool/version evidence.

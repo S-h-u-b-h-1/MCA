@@ -28,7 +28,7 @@ This is a **Verilog branch predictor prototype** with a 2-bit Branch History Tab
 - `make test-p4-compare`: automated reconciliation script guarantees Verilog simulation and Python oracle parity across all counts and fields before publishing evidence.
 - `make verify-p4`: full P4 simulation suite (654 checks), Yosys checked synthesis (0 problems, 92 cells for 1-bit, 284 cells for top), and dynamic VCD waveform generation completed.
 - P5 synthesis automation, validated metrics and report/video handoff merged in PRs #5–#7; six workflows passed on combined main commit `97c8290`.
-- Final QA adds a synthesizable P1/P2/P3 wrapper and self-checking integration regression. Verify its CI before merging. IEEE PDF and real video remain pending.
+- Final QA adds a synthesizable P1/P2/P3 wrapper and self-checking 16/32-entry integration regression (140/140 checks [passed in CI](https://github.com/S-h-u-b-h-1/MCA/actions/runs/42200408998)); review/merge this PR before presenting the wrapper as part of main. IEEE PDF and real video remain pending.
 
 ## Mac setup
 
@@ -111,7 +111,7 @@ make synth-all
 make metrics test-p5-metrics
 ```
 
-- Generic synthesis: `evidence/synthesis/summary.md` is the historical six-top snapshot until seven-top CI evidence is committed; raw outputs in `results/synthesis/`.
+- Generic synthesis: [seven-top evidence](evidence/synthesis/summary.md) from [successful Yosys 0.33 CI](https://github.com/S-h-u-b-h-1/MCA/actions/runs/42200408851); raw logs/netlists and tool/source-hash manifest are available from the CI artifact. Counts are generic, not FPGA LUTs or MHz.
 - Accuracy/CPI: `evidence/metrics/accuracy.csv`, `accuracy.svg`, and `cpi_assumptions.md`.
 - [P5 report contribution](report/P5_REPORT_SECTION.md) and [author handoff](report/PHASE1_REPORT_OUTLINE.md).
 - [Video capture plan](video/DEMO_STORYBOARD.md), [submission checklist](docs/P5_SUBMISSION_CHECKLIST.md), and [BPU integration signoff](docs/BPU_RELEASE_SIGNOFF.md).

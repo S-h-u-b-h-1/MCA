@@ -18,7 +18,7 @@ as part of main.
 | Next PC, mispredict/flush/redirect | P3 modules and interface-level integration; proposed synthesized BPU wrapper | Verify new wrapper CI and merge |
 | BEQ/BNE loop-oriented traces | 130 synthetic branches with HDL/Python parity | Disclose deterministic trace and cold-start limits |
 | Accuracy/CPI | `evidence/metrics/accuracy.csv`, `accuracy.svg`, `cpi_assumptions.md` | CPI is illustrative, not CPU-measured |
-| Logic resources | Six-top Yosys generic synthesis, source hashes/CI artifacts | Reproduce seven-top synthesis after BPU QA merge |
+| Logic resources | Seven-top Yosys 0.33 generic synthesis completed on the QA branch; manifest/netlists verified | Rerun on final merged main; do not claim FPGA LUTs or Fmax |
 | Maximum frequency | No selected FPGA, constraints or post-route timing report | **Unmeasured**; agree valid target flow or faculty-approved limitation |
 | IEEE technical report | P3/P4/P5 draft sections, P1/P2 design notes | Final all-author-reviewed IEEE PDF missing |
 | Prototype demo | Real simulation/VCDs and 4:45 storyboard | Real five-member recording and accessible URL missing |
@@ -39,7 +39,8 @@ misprediction CPI excludes BTB target misses and other processor effects.
 
 - [x] All original contributor PRs #1–#7 merged and main CI passed.
 - [x] BHT, BTB, control, traces, generic synthesis and illustrative CPI evidence available.
-- [ ] Run/merge final integrated BPU QA PR after its CI and seven-top synthesis pass.
+- [x] Verify BPU 16/32-entry regression (140 checks) and seven-top Yosys synthesis on QA branch.
+- [ ] Merge final integrated BPU QA PR; then confirm main CI.
 - [ ] Run `make test`, `make synth-all`, `make metrics test-p5-metrics` on final merged main.
 - [ ] Select a valid target timing flow or confirm with faculty that unmeasured Fmax may be disclosed.
 - [ ] Verify full names, affiliations, source citations and all five authors' section approvals.

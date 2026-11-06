@@ -36,8 +36,7 @@ saved metadata with a simultaneous unrelated fetch, and redirect priority.
 Icarus tests fail nonzero if any assertion fails.
 
 `make synth-all` includes the new wrapper as a seventh generic synthesis
-top. The prior six-top summary dated 5 November is a historical snapshot;
-the new seven-top counts must come from the actual updated CI run.
+top. The BPU integration run [42200408998](https://github.com/S-h-u-b-h-1/MCA/actions/runs/42200408998) passed 70 checks for each of 16-entry and 32-entry configurations (140 total). Seven-top generic synthesis passed in [CI run 42200408851](https://github.com/S-h-u-b-h-1/MCA/actions/runs/42200408851); the retained artifact was inspected against its JSON netlists and source-hash manifest. The committed summary records the verified Yosys 0.33 numbers, including 2,993 generic cells for the integrated wrapper. These are not device-mapped resources or Fmax.
 
 ## Faculty submission is still not finished
 
