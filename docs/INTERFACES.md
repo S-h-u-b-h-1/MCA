@@ -17,10 +17,10 @@ BHT starts with 16 independent entries, indexed by `PC[5:2]`, initialized to `01
 - Prediction is the MSB: `00/01` not-taken, `10/11` taken.
 - Distinct PCs that share these index bits alias; a tagless BHT **cannot** distinguish them.
 
-## P2 Branch Target Buffer (BTB) — implementation pending
+## P2 Branch Target Buffer (BTB) — implemented (PR #2)
 Proposed ports: inputs `clk, reset, lookup_pc[31:0], update_valid, update_pc[31:0], update_target[31:0]`; outputs `hit, target[31:0]`. Each of 16 entries should hold `valid`, `tag` (upper PC bits), and `target`. Index `PC[5:2]`; tag PC[31:6]. Initialize valid bits to zero. On update set valid+tag+target. On alias collision, newest valid tagged entry replaces prior entry. When `hit=0`, consumers must not use `target`.
 
-## P3 branch resolution — implementation pending
+## P3 branch resolution — implemented (PR #3)
 Proposed combinational inputs: `valid, branch_pc[31:0], predicted_taken, btb_hit, predicted_target[31:0], actual_taken, actual_target[31:0]`. Outputs: `mispredict, flush, redirect, redirect_pc[31:0]`.
 
 Define `actual_next_pc = actual_taken ? actual_target : (branch_pc + 4)`. A resolved branch requires recovery if direction mismatches OR if both directions are Taken but target lookup is missing/incorrect. `mispredict=valid && (predicted_taken != actual_taken || (actual_taken && (!btb_hit || predicted_target != actual_target)))`. Then `flush=mispredict`, `redirect=mispredict`, `redirect_pc=actual_next_pc` when redirecting. P3 must explicitly test all four direction combinations, BTB hit/miss and wrong targets. An actual pipeline would also manage staged metadata and instruction kills; a `flush` signal alone is not a full CPU.
@@ -30,3 +30,12 @@ Compare predictors on identical, *resolved* dynamic branch sequences. Count each
 
 ## P5 synthesis
 Use Yosys to report generic logic/resources. Yosys `stat` alone does not establish maximum clock speed for a particular FPGA; a suitable technology mapping/constraints/timing tool is needed to quote frequency.
+
+## Final synthesizable prediction subsystem
+
+`branch_prediction_unit` composes P1/P2/P3. The caller must supply saved
+fetch-time predictions (`resolve_predicted_*`) for the older resolving branch,
+and a validity bit; it must not reuse the current fetch lookup.
+Only valid resolutions train the BHT; only valid taken branches train the BTB.
+Recovery redirects override the current speculative PC.
+See `docs/BPU_RELEASE_SIGNOFF.md`. This is not a complete CPU pipeline.

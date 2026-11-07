@@ -1,44 +1,53 @@
 # Faculty requirements and evidence gates — MCA Project 5
 
-**Faculty source:** [Modern Computer Architecture Project 5: Dynamic Branch Prediction Unit](https://docs.google.com/document/d/1CoQOY3T4p0qY1B9qR3WPh8I93aCyN-zIs9VF17kBMNU/edit). Evaluation rubric: team notice shared 3 November 2026.
+**Source:** [Modern Computer Architecture Project 5](https://docs.google.com/document/d/1CoQOY3T4p0qY1B9qR3WPh8I93aCyN-zIs9VF17kBMNU/edit).
+Phase I deadline: **16 November 2026, 11:59 PM IST**.
 
-## Project 5 technical scope
+## Current implementation
 
-Implement and evaluate branch direction/target prediction to reduce control-hazard penalties. Faculty suggests BHT, 1-/2-bit prediction logic, update logic, branch-target storage, and a flush/control interface. Test loop-oriented BEQ and BNE branch traces; compare always-not-taken, 1-bit and 2-bit accuracy; estimate CPI impact with stated assumptions.
+P1–P5 contributions (PRs #1–#7) were merged and all six workflows passed on
+main commit `97c8290` (5 November 2026). This is a branch-direction/target
+prediction **prototype**, not a complete pipelined CPU. The final QA branch adds
+a synthesizable integrated BPU wrapper; verify/merge its PR before claiming it
+as part of main.
 
-| Faculty requirement | Evidence and current status (3 Nov) |
-| --- | --- |
-| System/microarchitecture diagram | `docs/system_workflow.png` and `docs/interactive_workflow.html`: conceptual; update after integration |
-| Synthesizable modular RTL | P1 predictor synthesized; P2 tagged BTB and P3 recovery modules pending |
-| Directed tests and simulation waveforms | P1 27,935 checks passed, VCD created; repository screenshot pending |
-| Baseline strategy comparison | Synthetic 32-branch test present; P4's BEQ/BNE trace suite and independent results pending |
-| Quantitative metrics and estimated CPI | Accuracy from synthetic trace exists; P5 larger experiments and explicit CPI assumptions pending |
-| Synthesis resources and **maximum operating frequency** | P1 generic 192 cells, 32 FF; **no target-specific timing or MHz yet** |
-| Technical report and live demonstration | Phase I/II preparation and video pending |
+| Faculty objective | Evidence | Remaining |
+| --- | --- | --- |
+| 2-bit BHT, baseline 1-bit/static predictors | P1/P4 RTL, self-checking unit and independent scoreboards | None for module-level scope |
+| Tagged BTB | P2 RTL, directed and parameterized tests | Include hit/miss/alias evidence in demo |
+| Next PC, mispredict/flush/redirect | P3 modules and interface-level integration; proposed synthesized BPU wrapper | Verify new wrapper CI and merge |
+| BEQ/BNE loop-oriented traces | 130 synthetic branches with HDL/Python parity | Disclose deterministic trace and cold-start limits |
+| Accuracy/CPI | `evidence/metrics/accuracy.csv`, `accuracy.svg`, `cpi_assumptions.md` | CPI is illustrative, not CPU-measured |
+| Logic resources | Seven-top Yosys 0.33 generic synthesis completed on the QA branch; manifest/netlists verified | Rerun on final merged main; do not claim FPGA LUTs or Fmax |
+| Maximum frequency | No selected FPGA, constraints or post-route timing report | **Unmeasured**; agree valid target flow or faculty-approved limitation |
+| IEEE technical report | P3/P4/P5 draft sections, P1/P2 design notes | Final all-author-reviewed IEEE PDF missing |
+| Prototype demo | Real simulation/VCDs and 4:45 storyboard | Real five-member recording and accessible URL missing |
 
-A common faculty requirement calls for resource utilization and maximum operating frequency. A real frequency number requires a chosen device/library, clock constraints, and timing/place-and-route analysis. A generic Yosys cell count cannot establish MHz or FPGA LUTs. Document any tool/device limitations if a measured Fmax is not feasible.
+Generic Yosys cells do not establish FPGA LUT utilization or maximum MHz.
+The 10 ns *simulation stimulus* is not hardware timing evidence. Direction
+misprediction CPI excludes BTB target misses and other processor effects.
 
-## Phase I: 30% of grade, due 16 November 2026, 11:59 PM IST
+## Phase I marking (30% of overall grade)
 
-| Deliverable | Marks | Required content | Status |
-| --- | ---: | --- | --- |
-| IEEE project report | 10 | Abstract, literature review, proposed solution, individual contributions, references | Working outline only; final formatted PDF pending |
-| Prototype demo video | 15 | Project idea, **all five members introduced**, working prototype/progress, **at most 5 minutes** | Storyboard present; actual video/link pending |
-| GitHub repository | 5 | Report PDF, demo-video link, prototype/source files, supporting artefacts and authentic individual history | Repository exists; P1 PR only so far |
+| Deliverable | Marks | Status |
+| --- | ---: | --- |
+| IEEE-formatted project report: Abstract, Literature Review, Proposed Solution, Individual Contributions, References | 10 | `report/Phase1_IEEE_Report.pdf` pending |
+| Prototype video (<=5 minutes; introduce all five members) | 15 | Storyboard prepared; real hosted video pending |
+| GitHub repository with report, video URL, authentic code/history/evidence | 5 | PR history/code/CI present; final PDF and video link still needed |
 
-Report outline: `report/PHASE1_REPORT_OUTLINE.md`. Final PDF: `report/Phase1_IEEE_Report.pdf`. Video link: `video/DEMO_LINK.md`. Submission: https://docs.google.com/forms/d/e/1FAIpQLSc6Cx8OrOQLGj_X2ZMkyG5jc8mokq36mGRq2x8jGRNV1sbegA/viewform
+## Final signoff
 
-### Remaining Phase I signoff
+- [x] All original contributor PRs #1–#7 merged and main CI passed.
+- [x] BHT, BTB, control, traces, generic synthesis and illustrative CPI evidence available.
+- [x] Verify BPU 16/32-entry regression (140 checks) and seven-top Yosys synthesis on QA branch.
+- [ ] Merge final integrated BPU QA PR; then confirm main CI.
+- [ ] Run `make test`, `make synth-all`, `make metrics test-p5-metrics` on final merged main.
+- [ ] Select a valid target timing flow or confirm with faculty that unmeasured Fmax may be disclosed.
+- [ ] Verify full names, affiliations, source citations and all five authors' section approvals.
+- [ ] Compile, visually check and commit `report/Phase1_IEEE_Report.pdf`.
+- [ ] Record/edit real 4:30–4:50 demo; introduce all five, show live proof, host accessible link.
+- [ ] Update README and `video/DEMO_LINK.md` with the same verified recording URL.
+- [ ] Verify report/video/evidence links, then [submit the Phase I form](https://docs.google.com/forms/d/e/1FAIpQLSc6Cx8OrOQLGj_X2ZMkyG5jc8mokq36mGRq2x8jGRNV1sbegA/viewform) before deadline.
 
-- [ ] Merge tested P2 BTB, P3 next-PC/recovery, P4 baseline/BEQ-BNE evaluation and P5 metric/report work.
-- [ ] Run integrated demonstration including correct prediction, wrong direction, BTB miss and wrong target.
-- [ ] Capture waveform screenshots, accuracy table and synthesis/resource evidence; state timing limitations.
-- [ ] Write/format IEEE report and accurately attribute all five members' real work.
-- [ ] Record a video of **no more than 5:00**, introduce all five, demonstrate actual progress, upload with accessible URL.
-- [ ] Verify every contributor's Git history, report and video URL in main and submit the form before the deadline.
-
-## Phase II: 70% of grade
-
-The **final IEEE report** must add Results and Discussion and Conclusion to the Phase I sections. Maintain meaningful Git history throughout the project. All members must defend the full architecture and their personal parts at the interview; exact interview slots have not been announced.
-
-**Do not claim:** a finished pipelined CPU, full-system integration, measured CPI improvement, target FPGA LUT use, or measured maximum MHz from P1-only evidence.
+Phase II adds final Results/Discussion and Conclusion; do not present a full CPU,
+fabricated timing, measured CPI, or unverifiable images as completed.

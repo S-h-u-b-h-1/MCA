@@ -4,9 +4,9 @@ Install Python 3 and Yosys, then run `make synth-all` from a clean checkout.
 The shell entry point also works from other directories. Override executable
 names using `make synth-all YOSYS=/path/to/yosys PYTHON=/path/to/python3`.
 
-Each of P1's 2-bit predictor, P4's 1-bit predictor, P2's tagged BTB,
-P3's next-PC mux and branch resolution, and the direction comparison top
-runs in a fresh process. All RTL dependencies are read, hierarchy is checked,
+P1's 2-bit predictor, P4's 1-bit predictor, P2's tagged BTB,
+P3's next-PC mux and branch resolution, the direction comparison top, and the
+integrated branch prediction unit each run in a fresh process. All RTL dependencies are read, hierarchy is checked,
 and `synth -flatten`, `check -assert`, `stat`, and `write_json` run in order.
 A nonzero Yosys exit stops the flow and no success summary is published.
 A previous summary is invalidated at the start of a rerun to prevent stale claims.
@@ -17,8 +17,9 @@ records tool version, exact RTL source hashes, cell totals and cell-type counts.
 CI uploads the raw generated directory even if a later step fails.
 Different Yosys/ABC versions may produce different generic cell counts.
 
-The current `predictor_top` is a direction-comparison wrapper. The P1/P2/P3
-combined harness is in `testbench/tb_integrated.sv`, which is not a synthesis top.
+The current `predictor_top` is a direction-comparison wrapper. The new
+`branch_prediction_unit` is synthesizable, but external pipeline registers are
+still required. The prior `testbench/tb_integrated.sv` remains simulation-only.
 Do not sum separately synthesized tops to claim whole-system resources.
 There is no device-specific LUT or maximum-frequency result in this flow.
 
@@ -84,3 +85,5 @@ checks. Device timing estimates also differ from an on-board frequency measureme
 Until the team chooses the target, ask the leader to confirm with faculty whether
 the explicitly disclosed unmeasured-Fmax limitation is acceptable. Do not choose
 an arbitrary part merely to generate a MHz number.
+
+The seven-top flow passed on QA commit `e0122ef` in [CI run 42200408851](https://github.com/S-h-u-b-h-1/MCA/actions/runs/42200408851). Its uploaded artifact (logs, JSON netlists and manifest) was inspected: all seven netlist cell totals match the manifest, and source hashes cover all eight RTL files. The committed summary reproduces Yosys 0.33 results from that CI run. Older six-top Mac results used Yosys 0.70+post and remain historical; different versions can yield different generic cell counts. Run `make synth-all` again on merged main and preserve its own tool/version evidence.

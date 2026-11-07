@@ -27,7 +27,8 @@ This is a **Verilog branch predictor prototype** with a 2-bit Branch History Tab
 - `make test-p4-oracle`: independent Python reference model verifies 100% agreement with explicit benchmark regression assertions.
 - `make test-p4-compare`: automated reconciliation script guarantees Verilog simulation and Python oracle parity across all counts and fields before publishing evidence.
 - `make verify-p4`: full P4 simulation suite (654 checks), Yosys checked synthesis (0 problems, 92 cells for 1-bit, 284 cells for top), and dynamic VCD waveform generation completed.
-- P5 synthesis automation, validated metrics/CPI and report/video integration are proposed in Lakshya’s contribution branches; merge and rerun before submission. Final report PDF and recorded video remain pending.
+- P5 synthesis automation, validated metrics and report/video handoff merged in PRs #5–#7; six workflows passed on combined main commit `97c8290`.
+- Final QA adds a synthesizable P1/P2/P3 wrapper and self-checking 16/32-entry integration regression (140/140 checks [passed in CI](https://github.com/S-h-u-b-h-1/MCA/actions/runs/42200408998)); review/merge this PR before presenting the wrapper as part of main. IEEE PDF and real video remain pending.
 
 ## Mac setup
 
@@ -48,9 +49,12 @@ make test-p4-comparison
 make test-p4-oracle
 make test-p4-compare
 make verify-p4
+make test-bpu
 make test
 make demo
 make synth-p1
+make synth-all
+make metrics test-p5-metrics
 surfer results/p1_bht.vcd
 ```
 
@@ -90,16 +94,16 @@ The two existing P1 RTL files were intentionally **left unchanged** from the
 
 - [Faculty Project 5 and Phase I/II checklist](docs/FACULTY_REQUIREMENTS.md): completed evidence versus outstanding deliverables.
 - [Start here for all teammates](docs/TEAM_START_HERE.md): forking, cloning, assigned branches and integration requirements; no collaborator invitation required.
-- P1–P4 RTL and tests are merged through PR #4, including P2/P3 simulation integration and BEQ/BNE traces. Target-specific timing, the final IEEE report and recorded video remain pending. This is a branch-predictor prototype.
+- P1–P5 contributions are merged through PR #7. A new synthesizable BHT/BTB/recovery wrapper is proposed in the final QA PR. This is a branch-prediction prototype, not a CPU. Target-specific timing, IEEE report PDF, and video are pending.
 
 ## P5 evaluation and submission handoff
 
-P5 contributions are open for review:
+P5 contributions have been merged:
 [synthesis #5](https://github.com/S-h-u-b-h-1/MCA/pull/5),
 [metrics #6](https://github.com/S-h-u-b-h-1/MCA/pull/6), and
 [report/video handoff #7](https://github.com/S-h-u-b-h-1/MCA/pull/7).
 
-After merging the P5 synthesis and metrics PRs:
+Final validation after merging the BPU QA PR:
 
 ```bash
 make test
@@ -107,10 +111,10 @@ make synth-all
 make metrics test-p5-metrics
 ```
 
-- Generic synthesis: `evidence/synthesis/summary.md`; raw logs/netlists in `results/synthesis/`.
+- Generic synthesis: [seven-top evidence](evidence/synthesis/summary.md) from [successful Yosys 0.33 CI](https://github.com/S-h-u-b-h-1/MCA/actions/runs/42200408851); raw logs/netlists and tool/source-hash manifest are available from the CI artifact. Counts are generic, not FPGA LUTs or MHz.
 - Accuracy/CPI: `evidence/metrics/accuracy.csv`, `accuracy.svg`, and `cpi_assumptions.md`.
 - [P5 report contribution](report/P5_REPORT_SECTION.md) and [author handoff](report/PHASE1_REPORT_OUTLINE.md).
-- [Video capture plan](video/DEMO_STORYBOARD.md) and [submission checklist](docs/P5_SUBMISSION_CHECKLIST.md).
+- [Video capture plan](video/DEMO_STORYBOARD.md), [submission checklist](docs/P5_SUBMISSION_CHECKLIST.md), and [BPU integration signoff](docs/BPU_RELEASE_SIGNOFF.md).
 
 The final PDF and public demo URL are pending. Add the tested hosted video URL
 here and in `video/DEMO_LINK.md` after recording; no final video is currently claimed.
