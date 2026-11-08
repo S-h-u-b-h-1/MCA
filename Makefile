@@ -9,7 +9,7 @@ P4_ALL_RTL = $(RTL) rtl/branch_target_buffer.v $(P3_RTL)
 BPU_RTL = rtl/branch_history_table.v rtl/predictor_2bit.v rtl/branch_target_buffer.v $(P3_RTL) rtl/branch_prediction_unit.v
 
 .PHONY: help test test-p1 test-p1-extended test-p1-scoreboard verify-p1 demo synth-p1 synth-p1-checked clean
-.PHONY: test-p3 test-p3-integrated verify-p3 synth-p3-checked
+.PHONY: test-p3 test-p3-integrated verify-p3 synth-p3-checked waveform-p1 waveform-p3 waveform-bpu
 .PHONY: test-p4 test-p4-unit test-p4-comparison test-p4-oracle test-p4-compare verify-p4 synth-p4-checked check-traces traces waveform-p4
 
 # P5 metrics always refresh HDL/oracle reconciliation first.
@@ -118,7 +118,19 @@ synth-p3-checked:
 	  'read_verilog rtl/next_pc_mux.v; synth -top next_pc_mux; check -assert; stat; read_verilog rtl/branch_resolution.v; synth -top branch_resolution; check -assert; stat' > /dev/null
 	@echo "Checked generic synthesis for P3 completed; see results/p3_synthesis_checked.log"
 
-verify-p3: test-p3 test-p3-integrated synth-p3-checked
+waveform-p1: test-p1
+	@mkdir -p evidence/waveforms
+	@uv run --with matplotlib python3 scripts/render_p1_waveform.py 2>/dev/null || $(PYTHON) scripts/render_p1_waveform.py
+
+waveform-p3: test-p3-integrated
+	@mkdir -p evidence/waveforms
+	@uv run --with matplotlib python3 scripts/render_p3_waveform.py 2>/dev/null || $(PYTHON) scripts/render_p3_waveform.py
+
+waveform-bpu: test-bpu
+	@mkdir -p evidence/waveforms
+	@uv run --with matplotlib python3 scripts/render_bpu_waveform.py 2>/dev/null || $(PYTHON) scripts/render_bpu_waveform.py
+
+verify-p3: test-p3 test-p3-integrated synth-p3-checked waveform-p3 waveform-bpu
 	@echo "P3 VERIFICATION COMMANDS COMPLETED; inspect logs and preserve evidence."
 
 # ==============================================================================
