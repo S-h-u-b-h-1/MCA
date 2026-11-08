@@ -1,0 +1,12 @@
+rtl/branch_target_buffer.v:1: warning: timescale for branch_target_buffer inherited from another file.
+rtl/predictor_2bit.v:1: ...: The inherited timescale is here.
+VCD info: dumpfile results/bpu_integration.vcd opened for output.
+BPU INDEX_BITS=4: 70 checks, 0 failures
+ALL BPU INTEGRATION TESTS PASSED (70 checks)
+testbench/tb_branch_prediction_unit.sv:213: $finish called at 331000 (1ps)
+rtl/branch_target_buffer.v:1: warning: timescale for branch_target_buffer inherited from another file.
+rtl/predictor_2bit.v:1: ...: The inherited timescale is here.
+VCD info: dumpfile results/bpu_integration.vcd opened for output.
+BPU INDEX_BITS=5: 70 checks, 0 failures
+ALL BPU INTEGRATION TESTS PASSED (70 checks)
+testbench/tb_branch_prediction_unit.sv:213: $finish called at 331000 (1ps)
