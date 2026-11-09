@@ -173,14 +173,20 @@ The `branch_resolution` module accepts these saved signals directly, ensuring de
 
 ## 8. Waveform Evidence & VCD Provenance
 
-All simulation waveforms are generated deterministically from genuine Icarus Verilog VCD dumps using python rendering scripts matching professional digital oscilloscope aesthetics:
+All simulation waveforms are digital waveform diagrams plotted directly from genuine Icarus Verilog VCD dumps using Python Matplotlib renderers under a simulated 10 ns testbench clock (not measured hardware Fmax):
 
-| Waveform File | Source VCD | Generating Script | Key Visual Verification Points |
+| Waveform File | Source VCD & Provenance | Generating Script | Key Visual Verification Points |
 |---|---|---|---|
-| `evidence/waveforms/p1_bht.png` | `results/p1_bht.vcd` | `scripts/render_p1_waveform.py` | **Independently captured evidence for Shubhaang's P1 RTL:** Verifies 2-bit counter state progression `01 → 10 → 11 → 10 → 01 → 00`, reset to `01`, saturation at `11` and `00`, and index isolation. |
-| `evidence/waveforms/bpu_integration.png` | `results/bpu_integration.vcd` | `scripts/render_bpu_waveform.py` | **Top-level BPU proof:** Shows cold fetch fallthrough, direction mispredict flush & redirect, zero-bubble taken hit, target mispredict recovery, and redirect priority over speculative fetch. |
-| `evidence/waveforms/p3_integrated_simulation.png` | `results/p3_integrated.vcd` | `scripts/render_p3_waveform.py` | Closed-loop integration timing showing metadata sampling, redirect priority, and loop backward branch resolution. |
+| `evidence/waveforms/p1_bht.png` | `results/p1_bht.vcd` (`make test-p1`, timescale 1ps) | `scripts/render_p1_waveform.py` | **Independently captured evidence for Shubhaang's P1 RTL:** Verifies 2-bit counter state progression `01 → 10 → 11 → 10 → 01 → 00`, reset to `01`, saturation at `11` and `00`, and index isolation. |
+| `evidence/waveforms/bpu_integration.png` | `results/bpu_integration.vcd` (`make test-bpu` pass 2, `INDEX_BITS=5`, timescale 1ps) | `scripts/render_bpu_waveform.py` | **Top-level BPU proof:** Shows cold fetch fallthrough, direction mispredict flush & redirect, correct taken+BTB-hit combinational next-PC selection (with no recovery redirect in this test case), target mispredict recovery, and redirect priority over speculative fetch. |
+| `evidence/waveforms/p3_integrated_simulation.png` | `results/p3_integrated.vcd` (`make test-p3-integrated`, timescale 1ps) | `scripts/render_p3_waveform.py` | Closed-loop integration timing showing metadata sampling, redirect priority, and loop backward branch resolution. |
 | `evidence/waveforms/p3_control.png` | Conceptual / RTL | Matplotlib | Architectural timing diagram showing fetch and resolution pipeline stages. |
+
+> **Authorship Credit Note:**
+> - Top-Level BPU Subsystem Wrapper (`branch_prediction_unit.v`) and PR #8: Shubhaang (@S-h-u-b-h-1)
+> - P1 2-bit BHT RTL (`predictor_2bit.v`, `branch_history_table.v`): Shubhaang (@S-h-u-b-h-1)
+> - P2 Tagged BTB RTL (`branch_target_buffer.v`): Tanish (@tanishrao13)
+> - P3 Next-PC & Resolution RTL (`next_pc_mux.v`, `branch_resolution.v`), Integration Harness (`tb_integrated.sv`), and Python Waveform Renderers: Tanmay Singh (@tanmay-7706)
 
 ---
 

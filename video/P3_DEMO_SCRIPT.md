@@ -1,10 +1,12 @@
-# P3 Prototype Video Script & Narration — Tanmay Singh
+# P3 Prototype Video Script & Narration Guide — Tanmay Singh
 
 **Presenter:** Tanmay Singh
 **Role:** Person 3 (P3) — Next-PC Selection, Branch Resolution, and Control Integration
 **Recipient / Video Editor:** Vansh (@VanshP018)
-**Target Segment Length:** 35 seconds total (0:10 member intro + 0:35 technical demonstration)
-**Status:** Ready for recording / final audio & video track splice
+**Allocated Storyboard Duration:** 45 seconds total across two video segments:
+  - Introduction: 10 seconds (0:30–0:40)
+  - Technical Demonstration: 35 seconds (2:05–2:40)
+**Status:** Prepared script & recording guide; authentic audio/video recording pending handoff to Vansh
 
 ---
 
@@ -17,21 +19,21 @@ In the 5-member Phase I demonstration video (`video/DEMO_STORYBOARD.md`), Tanmay
 
 ---
 
-## 2. Spoken Narration Script (Verbatim)
+## 2. Spoken Narration Script (Targeted for Comfortable Pacing)
 
-### Segment A: Self-Introduction (Timestamp: 0:30 – 0:40)
-> *"Hi everyone, I am Tanmay Singh, responsible for Person 3: Next-PC Selection, Branch Resolution, and Control Integration for our Branch Prediction Unit."*
+### Segment A: Self-Introduction (Timestamp: 0:30 – 0:40 | ~18 words, ~8 seconds)
+> *"Hi everyone, I am Tanmay Singh, responsible for Person 3: Next-PC Selection, Branch Resolution, and Control Integration."*
 
-### Segment B: Technical Demonstration & Verification (Timestamp: 2:05 – 2:40)
+### Segment B: Technical Demonstration & Verification (Timestamp: 2:05 – 2:40 | ~85 words, ~30 seconds)
 *(Screen shows clean terminal running `make test-p3 test-p3-integrated && make test-bpu`, followed by waveform display of `evidence/waveforms/bpu_integration.png`)*
 
-> *"I designed the control logic that interfaces our 2-bit BHT and tagged BTB to the processor pipeline.*
+> *"I implemented the next-PC multiplexer and execute-stage branch resolution logic.
 >
-> *During fetch, the `next_pc_mux` speculatively steers execution: when the predictor indicates taken and the BTB hits, it branches immediately to the cached target; on a BTB miss or not-taken prediction, it safely falls back to sequential PC plus 4.*
+> During fetch, `next_pc_mux` speculatively selects the BTB target when predicted taken, or falls back to PC plus 4 on BTB misses or not-taken predictions.
 >
-> *During execution, `branch_resolution` evaluates the actual outcome against saved fetch metadata. Looking at our verified simulation waveform: on a direction misprediction or target mismatch, the unit asserts `mispredict`, pulses `flush` to squash wrong-path instructions, and asserts `redirect` to steer fetch to the corrected target.*
+> During execution, `branch_resolution` checks actual outcomes against saved fetch metadata. On a direction or target misprediction, it asserts `mispredict`, pulses `flush` to squash wrong-path instructions, and asserts `redirect` to steer fetch to the corrected target with priority over speculative fetch.
 >
-> *The recovery redirect has strict priority over speculative fetch. All 50 P3 unit tests and all 140 top-level BPU integration checks pass cleanly across parameter sizes."*
+> All 50 P3 unit tests and 140 top-level BPU integration checks pass."*
 
 ---
 
@@ -47,11 +49,11 @@ In the 5-member Phase I demonstration video (`video/DEMO_STORYBOARD.md`), Tanmay
 - **Visual Cue:** Show all 24 branch control checks passing, all 26 integrated checks passing, and all 140 BPU regression checks (70 on `INDEX_BITS=4`, 70 on `INDEX_BITS=5`) with zero failures.
 
 ### Scene 2: Waveform Inspection (Duration: ~20s)
-- **Asset Displayed:** Open `evidence/waveforms/bpu_integration.png` (or view `results/bpu_integration.vcd` in GTKWave/Surfer).
+- **Asset Displayed:** Open `evidence/waveforms/bpu_integration.png` (or view `results/bpu_integration.vcd` in GTKWave).
 - **Cursor Focus Areas:**
   1. **Phase 1 (Cold Fetch, 25ns):** `predicted_taken=0`, `btb_hit=0`, `selected_next_pc=0x1004` (PC+4 fallback).
   2. **Phase 2 (Mispredict Recovery, 40ns):** `mispredict=1`, `flush=1`, `redirect=1`, `redirect_pc=0x2000`, `selected_next_pc` redirected to `0x2000`.
-  3. **Phase 3 (Zero-Bubble Hit, 60ns):** `predicted_taken=1`, `btb_hit=1`, `predicted_target=0x2000`, `mispredict=0`, `flush=0` (seamless pipelined execution).
+  3. **Phase 3 (Correct Prediction, 60ns):** `predicted_taken=1`, `btb_hit=1`, `predicted_target=0x2000`, `mispredict=0`, `flush=0` (correct taken+BTB-hit combinational next-PC selection, with no recovery redirect in this test case).
   4. **Phase 4 (Target Misprediction, 80ns):** Resolved target mismatch (`0x3000` vs `0x2000`), recovery `redirect_pc=0x3000`.
   5. **Phase 5 (Direction Misprediction T→NT, 100ns):** `redirect_pc=0x1004` (branch PC+4 recovery).
 
@@ -73,7 +75,10 @@ In the 5-member Phase I demonstration video (`video/DEMO_STORYBOARD.md`), Tanmay
 ---
 
 ## 5. Speaker Checklist Before Video Submission
-- [x] Spoken duration strictly within 35 seconds.
-- [x] Clear pronunciation of technical terms (`next_pc_mux`, `branch_resolution`, `2-bit BHT`, `tagged BTB`, `flush`, `redirect`).
-- [x] Terminal text and waveform signal labels are crisp and readable (1080p minimum).
-- [x] Independent authorship boundaries respected: P1 (Shubhaang), P2 (Tanish), P3 (Tanmay), P4 (Vansh), P5 (Lakshya).
+- [ ] Spoken duration confirmed under 35 seconds for technical demo in authentic recording.
+- [ ] Clear pronunciation of technical terms (`next_pc_mux`, `branch_resolution`, `2-bit BHT`, `tagged BTB`, `flush`, `redirect`).
+- [ ] Terminal text and waveform signal labels are crisp and readable (1080p minimum).
+- [ ] Independent authorship boundaries respected: P1 (Shubhaang), P2 (Tanish), P3 (Tanmay), P4 (Vansh), P5 (Lakshya).
+- [ ] Authentic audio/screen recording clip handed to Vansh (@VanshP018) for video compilation.
+
+> **Recording Handoff Notice:** This document defines the prepared narration script and visual cues. An authentic screen recording and spoken audio clip must be captured by Tanmay and provided directly to `@VanshP018` for inclusion in the final Phase I video.
