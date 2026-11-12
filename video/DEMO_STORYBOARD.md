@@ -38,6 +38,19 @@ Use a full simulator/VCD viewer for waveform verification. Existing images under
 `evidence/waveforms/` can support narration; the interactive HTML is supplemental.
 Do not describe a conceptual diagram as a captured simulator result.
 
+## Tanmay's narration points (P3)
+
+See detailed script and recording cues in `video/P3_DEMO_SCRIPT.md`.
+
+“Hi everyone, I am Tanmay Singh, responsible for Person 3: Next-PC Selection,
+Branch Resolution, and Control Integration. During fetch, the `next_pc_mux` speculatively
+steers execution to the BTB target on taken predictions, falling back to PC+4 on BTB
+misses or not-taken predictions. During execution, `branch_resolution` evaluates actual
+branch outcomes against saved fetch metadata. Looking at our verified simulation waveform,
+mispredictions pulse `flush` to squash wrong-path instructions and assert `redirect` to
+steer fetch to the corrected target with priority over speculative fetch. All 50 P3 unit
+tests and all 140 top-level BPU integration checks pass cleanly across parameter sizes.”
+
 ## Lakshya's narration points
 
 “I run each RTL top through checked generic synthesis. These counts describe

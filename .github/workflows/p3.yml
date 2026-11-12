@@ -2,7 +2,7 @@ name: P3 verification
 
 on:
   push:
-    branches: [main, feature/tanmay-control]
+    branches: [main, feature/tanmay-control, feature/tanmay-issue-9-evidence]
   pull_request:
 
 permissions:
@@ -16,18 +16,40 @@ jobs:
       - name: Checkout PR commit
         uses: actions/checkout@v4
 
-      - name: Install Icarus Verilog and Yosys
+      - name: Install Icarus Verilog, Yosys, and Python plotting dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends iverilog yosys
+          sudo apt-get install -y --no-install-recommends \
+            iverilog \
+            yosys \
+            python3 \
+            python3-pip \
+            python3-matplotlib \
+            python3-numpy \
+            python3-pil
 
-      - name: Run P3 verification suite and checked synthesis
+      - name: Run VCD parser unit tests
+        run: make test-p3-parser
+
+      - name: Run P3 verification suite, synthesis, and waveform generation
         run: make verify-p3
 
-      - name: Upload logs if a step fails
+      - name: Render and verify all P1, P3, and BPU waveforms
+        run: make waveforms
+
+      - name: Assert generated waveform artifacts exist and are non-empty
+        run: |
+          test -s evidence/waveforms/p1_bht.png
+          test -s evidence/waveforms/bpu_integration.png
+          test -s evidence/waveforms/p3_integrated_simulation.png
+          echo "All waveform artifacts successfully generated and verified."
+
+      - name: Upload logs and waveforms if a step fails
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: p3-verification-logs
-          path: results/*.log
+          name: p3-verification-artifacts
+          path: |
+            results/*.log
+            evidence/waveforms/*.png
           if-no-files-found: ignore
