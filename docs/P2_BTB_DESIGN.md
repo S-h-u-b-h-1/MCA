@@ -77,3 +77,9 @@ P3 uses only hit and target, and ignores target when hit=0. A wrong target is co
 
 ## 12. Known limitations
 Direct-mapped, so aliasing PCs evict each other. Reset clears valid bits only; tags and targets are not cleared. Lookup is combinational; updates become visible after the clock edge.
+
+## 13. Review notes (checked against rtl/branch_target_buffer.v)
+- On a miss, `target` is driven to 32'h00000000 (RTL line 26). P3 must still use `hit` to decide.
+- Valid bits have no initial value. `hit` is X until the first clock edge with `reset = 1`, so the system must assert reset at power-up.
+- Reset is synchronous and has priority over `update_valid`.
+- The RTL has no `timescale` directive, so Icarus prints a harmless timescale warning.
