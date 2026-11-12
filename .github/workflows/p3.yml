@@ -28,6 +28,9 @@ jobs:
             python3-numpy \
             python3-pil
 
+      - name: Run VCD parser unit tests
+        run: make test-p3-parser
+
       - name: Run P3 verification suite, synthesis, and waveform generation
         run: make verify-p3
 

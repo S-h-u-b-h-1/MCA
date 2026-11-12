@@ -31,108 +31,16 @@ Provenance & Authorship:
 """
 
 import os
-import re
 import sys
+from pathlib import Path
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
+_SCRIPTS_DIR = str(Path(__file__).resolve().parent)
+if _SCRIPTS_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPTS_DIR)
 
-def parse_vcd_header(vcd_path, target_scope, required_signals):
-    scope_stack = []
-    signals = {}
-    timescale_str = "1ps"
-    timescale_ns = 0.001
-
-    with open(vcd_path, "r", encoding="utf-8", errors="replace") as f:
-        in_timescale = False
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            if line.startswith("$timescale"):
-                in_timescale = True
-                continue
-            if in_timescale:
-                if "$end" in line:
-                    in_timescale = False
-                else:
-                    timescale_str = line.replace("$end", "").strip()
-                    m = re.match(r"(\d+)\s*([a-z]+)", timescale_str)
-                    if m:
-                        val = int(m.group(1))
-                        unit = m.group(2)
-                        unit_mult = {
-                            "s": 1e9,
-                            "ms": 1e6,
-                            "us": 1e3,
-                            "ns": 1.0,
-                            "ps": 1e-3,
-                            "fs": 1e-6,
-                        }
-                        timescale_ns = val * unit_mult.get(unit, 1e-3)
-                continue
-            if line.startswith("$scope"):
-                parts = line.split()
-                scope_stack.append(parts[2])
-            elif line.startswith("$upscope"):
-                if scope_stack:
-                    scope_stack.pop()
-            elif line.startswith("$var"):
-                parts = line.split()
-                var_type = parts[1]
-                size = int(parts[2])
-                sym = parts[3]
-                var_name = parts[4]
-                curr_scope = ".".join(scope_stack)
-                signals[(curr_scope, var_name)] = (sym, size)
-            elif line.startswith("$enddefinitions"):
-                break
-
-    resolved = {}
-    missing = []
-    for sig_name in required_signals:
-        key = (target_scope, sig_name)
-        if key in signals:
-            resolved[sig_name] = signals[key]
-        else:
-            missing.append(sig_name)
-
-    if missing:
-        raise RuntimeError(
-            f"VCD parsing error: Missing required signals in scope '{target_scope}': {missing}"
-        )
-
-    return timescale_str, timescale_ns, resolved
-
-
-def parse_vcd_transitions(vcd_path, symbol_map):
-    tracked_symbols = set(symbol_map.values())
-    transitions = {sym: [] for sym in tracked_symbols}
-    current_time = 0
-
-    with open(vcd_path, "r", encoding="utf-8", errors="replace") as f:
-        for line in f:
-            if line.strip().startswith("$enddefinitions"):
-                break
-
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            if line.startswith("#"):
-                current_time = int(line[1:])
-            elif line.startswith("b"):
-                parts = line.split()
-                val = parts[0][1:]
-                sym = parts[1]
-                if sym in transitions:
-                    transitions[sym].append((current_time, val))
-            elif len(line) >= 2 and line[1:] in transitions:
-                val = line[0]
-                sym = line[1:]
-                transitions[sym].append((current_time, val))
-
-    return transitions
+from vcd_parser import parse_vcd_header, parse_vcd_transitions
 
 
 def render_bpu_waveform():
