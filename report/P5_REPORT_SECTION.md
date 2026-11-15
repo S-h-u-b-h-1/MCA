@@ -1,3 +1,5 @@
+> **Historical P5 draft/assembly handoff:** This section predates final integration. The final [Phase I IEEE PDF](Phase1_IEEE_Report.pdf) is committed (PR #15); the [4:53.7 demonstration](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing) is published (PR #16); the final integrated BPU is a seventh generic synthesis top. Use [pinned CI evidence](../evidence/synthesis/summary.md) for its Yosys 0.33 counts. The video shows a separate Yosys 0.70+post local run; its generic counts need not match across versions. Coauthor approvals and a target-specific Fmax remain unverified.
+
 # P5 report contribution by Lakshya
 
 Status: section draft for team review, to integrate after the P5 synthesis and

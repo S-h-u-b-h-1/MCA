@@ -115,6 +115,7 @@ make metrics test-p5-metrics
 ```
 
 - Generic synthesis: [seven-top evidence](evidence/synthesis/summary.md) from [successful Yosys 0.33 CI](https://github.com/S-h-u-b-h-1/MCA/actions/runs/42200408851); raw logs/netlists and tool/source-hash manifest are available from the CI artifact. Counts are generic, not FPGA LUTs or MHz.
+- **Video versus pinned synthesis evidence:** the P5 capture shows 2,907 generic BPU cells under local Yosys 0.70+post; the committed Yosys 0.33 CI evidence reports 2,993 generic cells. Tool-version outputs are not directly comparable (see [demo verification notes](video/DEMO_LINK.md)).
 - Accuracy/CPI: `evidence/metrics/accuracy.csv`, `accuracy.svg`, and `cpi_assumptions.md`.
 - [P5 report contribution](report/P5_REPORT_SECTION.md) and [author handoff](report/PHASE1_REPORT_OUTLINE.md).
 - [Video capture plan](video/DEMO_STORYBOARD.md), [submission checklist](docs/P5_SUBMISSION_CHECKLIST.md), and [BPU integration signoff](docs/BPU_RELEASE_SIGNOFF.md).
