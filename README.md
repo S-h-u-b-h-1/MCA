@@ -28,7 +28,7 @@ This is a **Verilog branch predictor prototype** with a 2-bit Branch History Tab
 - `make test-p4-compare`: automated reconciliation script guarantees Verilog simulation and Python oracle parity across all counts and fields before publishing evidence.
 - `make verify-p4`: full P4 simulation suite (654 checks), Yosys checked synthesis (0 problems, 92 cells for 1-bit, 284 cells for top), and dynamic VCD waveform generation completed.
 - P5 synthesis automation, validated metrics and report/video handoff merged in PRs #5–#7; six workflows passed on combined main commit `97c8290`.
-- Final QA adds a synthesizable P1/P2/P3 wrapper and self-checking 16/32-entry integration regression (140/140 checks [passed in CI](https://github.com/S-h-u-b-h-1/MCA/actions/runs/42200408998)); review/merge this PR before presenting the wrapper as part of main. IEEE PDF and real video remain pending.
+- Final QA PR #8 merged a synthesizable P1/P2/P3 wrapper and self-checking 16/32-entry integration regression (140/140 checks [passed in CI](https://github.com/S-h-u-b-h-1/MCA/actions/runs/42200408998)). The Phase I IEEE report is now committed; a final duration-compliant, accessible team video link is still pending.
 
 ## Mac setup
 
@@ -75,7 +75,7 @@ Read `docs/INTERFACES.md` first, then `docs/PROJECT_PLAN.md`, then your own guid
 ## Submission
 
 - Use the [official IEEE conference templates](https://conferences.ieeeauthorcenter.ieee.org/write-your-paper/authoring-tools-and-templates/) unless faculty provides a specific local variant.
-- Put the real final report at `report/Phase1_IEEE_Report.pdf` when ready.
+- **Final Phase I IEEE report:** [`report/Phase1_IEEE_Report.pdf`](report/Phase1_IEEE_Report.pdf) (approved for coursework submission by the team lead).
 - Put a public/accessible video link in `video/DEMO_LINK.md` and README; don't commit a large MP4 to Git.
 - Confirm every team member appears in the video and has substantive commits and a report contribution.
 - Submission form: https://docs.google.com/forms/d/e/1FAIpQLSc6Cx8OrOQLGj_X2ZMkyG5jc8mokq36mGRq2x8jGRNV1sbegA/viewform
@@ -94,7 +94,7 @@ The two existing P1 RTL files were intentionally **left unchanged** from the
 
 - [Faculty Project 5 and Phase I/II checklist](docs/FACULTY_REQUIREMENTS.md): completed evidence versus outstanding deliverables.
 - [Start here for all teammates](docs/TEAM_START_HERE.md): forking, cloning, assigned branches and integration requirements; no collaborator invitation required.
-- P1–P5 contributions are merged through PR #7. A new synthesizable BHT/BTB/recovery wrapper is proposed in the final QA PR. This is a branch-prediction prototype, not a CPU. Target-specific timing, IEEE report PDF, and video are pending.
+- P1–P5, BPU QA (#8), BTB evidence (#13), P1/P3/BPU waveform evidence (#14), and IEEE report (#15) are merged. This is a branch-prediction prototype, not a full CPU. Target-specific Fmax is unmeasured; the final video link is pending.
 
 ## P5 evaluation and submission handoff
 
@@ -103,7 +103,7 @@ P5 contributions have been merged:
 [metrics #6](https://github.com/S-h-u-b-h-1/MCA/pull/6), and
 [report/video handoff #7](https://github.com/S-h-u-b-h-1/MCA/pull/7).
 
-Final validation after merging the BPU QA PR:
+Final local validation on merged `main`:
 
 ```bash
 make test
@@ -116,5 +116,4 @@ make metrics test-p5-metrics
 - [P5 report contribution](report/P5_REPORT_SECTION.md) and [author handoff](report/PHASE1_REPORT_OUTLINE.md).
 - [Video capture plan](video/DEMO_STORYBOARD.md), [submission checklist](docs/P5_SUBMISSION_CHECKLIST.md), and [BPU integration signoff](docs/BPU_RELEASE_SIGNOFF.md).
 
-The final PDF and public demo URL are pending. Add the tested hosted video URL
-here and in `video/DEMO_LINK.md` after recording; no final video is currently claimed.
+The [Phase I IEEE report](report/Phase1_IEEE_Report.pdf) is committed. Add the **verified, under-five-minute** hosted video URL here and in `video/DEMO_LINK.md` after final editing and signed-out access testing; no final video is currently claimed.
