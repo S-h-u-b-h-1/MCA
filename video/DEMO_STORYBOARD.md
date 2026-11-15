@@ -1,3 +1,5 @@
+> **Final published demonstration (16 November 2026):** [Watch the 4:53.7 video](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing); [verification notes](DEMO_LINK.md). This storyboard is retained as the original editing plan.
+
 # Phase I prototype video storyboard
 
 Target duration: 4:45 (285 seconds). Record all five people introducing
