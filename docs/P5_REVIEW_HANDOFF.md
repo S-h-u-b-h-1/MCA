@@ -1,5 +1,7 @@
 # P5 maintainer review handoff
 
+> **Historical note (6 November 2026):** This handoff records then-open PRs. PRs #5–#7 and #13–#15 have since merged, the final [IEEE report](../report/Phase1_IEEE_Report.pdf) is committed, and the [4:53.7 video](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing) is hosted. The Google Form receipt was received 16 November 2026. Refer to [current submission checklist](P5_SUBMISSION_CHECKLIST.md) for outstanding acknowledgments.
+
 Reviewed on 6 November 2026. PRs #5, #6 and #7 are still open; no merge is claimed.
 Continue with these PRs in the requested order: synthesis, metrics, then docs.
 The leader retains final review and merge responsibility.

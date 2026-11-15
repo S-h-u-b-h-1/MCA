@@ -1,4 +1,6 @@
-# Phase I IEEE report — working outline, not the final IEEE-formatted file
+# Phase I IEEE report — historical assembly outline
+
+**Current submission artifact:** [Phase I IEEE report](Phase1_IEEE_Report.pdf) (merged PR #15). **Final video:** [4:53.7 MCA demonstration](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing). The Google Form submission receipt was received 16 November 2026 at 01:48 IST. The remaining all-author acknowledgments are not represented as obtained.
 
 Use the **official IEEE conference A4/Word or LaTeX template** unless the instructor provides a different IEEE template. Do not submit this Markdown outline as the formatted report.
 
@@ -23,7 +25,7 @@ Official templates: https://conferences.ieeeauthorcenter.ieee.org/write-your-pap
 
 P1–P4 are merged through PR #4. P5 synthesis, metrics and submission-integration
 changes are being proposed separately; include their files after those PRs merge.
-The final IEEE PDF is still pending author review and formatting.
+At this 5 November handoff the PDF was pending. It was subsequently committed in PR #15; full author acknowledgment remains an open evidence question.
 
 | Section | Author or reviewer | Source and remaining action |
 | --- | --- | --- |

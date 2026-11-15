@@ -22,12 +22,18 @@ Fetch PC -> (P1 BHT and P2 BTB parallel) -> P3 Next-PC -> resolution -> P3 compa
 - **16 Nov:** Submit BEFORE 11:59 PM IST (aim for evening buffer); archive evidence and submission receipt.
 
 ## Submission checks
-- [ ] IEEE abstract, literature review, proposed solution, individual contributions, references.
-- [ ] All five introduced and visible/heard in video of less than five minutes.
-- [ ] Report and video link in repo.
-- [ ] Actual working Verilog, testbenches, verified waveforms, metrics and synthesis evidence.
-- [ ] Authentic individual Git commits and reviewed PRs.
-- [ ] Phase I form submitted before deadline.
+- [x] IEEE report with required Phase I sections committed as `report/Phase1_IEEE_Report.pdf` (PR #15).
+- [x] P1–P5 presentation sections spot-checked in the [4:53.7 MP4](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing); audio track and segment audio verified. Speaker/consent signoff remains separate.
+- [x] Report and video link in repo (README and `video/DEMO_LINK.md`).
+- [x] Verilog, testbenches, waveforms, metrics and generic synthesis evidence merged.
+- [x] Individual work integrated through PR history #1–#15; five-member approvals still require independent acknowledgment.
+- [x] Phase I form submitted; official response receipt received 16 November 2026, 01:48 IST.
 
 ## Project restrictions
 Do not claim a full CPU, measured CPU speedup, target FPGA operating frequency, or passing tests that have not been run.
+
+## Post-submission evidence (16 November 2026)
+
+- Final demonstration: [hosted 293.7-second video](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing); Google Drive sharing is `Anyone with the link → Viewer`.
+- Report: [Phase I IEEE PDF](../report/Phase1_IEEE_Report.pdf).
+- Outstanding administrative follow-up: five coauthor acknowledgments, signed-out browser playback, and faculty handling of unmeasured Fmax (see [faculty checklist](FACULTY_REQUIREMENTS.md)).

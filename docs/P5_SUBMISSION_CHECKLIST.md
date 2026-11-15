@@ -1,47 +1,22 @@
-# P5 integration status and submission handoff
+# P5 final submission handoff — 16 November 2026
 
-Reviewed on 5 November 2026 against main at `734c04b` and the P5 working branches.
-P1–P4 are merged through PR #4. P5 adds evaluation/integration work; it does not
-claim authorship of the existing team RTL or tests.
+This is the current checklist; the dated engineering/review record is retained in [P5 review handoff](P5_REVIEW_HANDOFF.md). No faculty approval or coauthor consent is inferred from the receipt.
 
-## Checked locally during P5 work
+## Completed and evidenced
 
-- `make test`: existing P1/P2/P3/P4 regression and HDL/oracle reconciliation passed.
-- `make synth-all`: all six synthesizable tops passed checked generic synthesis.
-- Failed Yosys invocation: nonzero exit with no stale success summary.
-- `make metrics test-p5-metrics`: counts reconciled; 12 derived predictor rows;
-  10 focused tests passed, including independent arithmetic and corrupt CSV rejection.
+- [x] P1–P5 PRs #1–#7 merged; BPU QA #8, BTB evidence #13, P3 waveform evidence #14, and Phase I report #15 merged.
+- [x] Existing hardware and metric verification: [main CI suite at `ee7f45c`](https://github.com/S-h-u-b-h-1/MCA/actions/runs/42348113271) and other successful workflows; locally recorded P5 tests, seven-top generic synthesis, and metric reconciliation are in `evidence/`.
+- [x] The [final Phase I IEEE report](../report/Phase1_IEEE_Report.pdf) is committed. The README calls it approved for coursework submission by the team lead.
+- [x] The [final team demonstration](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing) is uploaded. Original MP4 was inspected with `ffprobe`: 293.700 s (4:53.7), H.264/1080p + AAC audio. P1–P5 visual sections and audio presence were spot-checked.
+- [x] Google Drive permissions show `Anyone with the link → Viewer`; the same URL appears in [README](../README.md) and [video/DEMO_LINK.md](../video/DEMO_LINK.md).
+- [x] The team lead submitted the official Phase I Google Form; response receipt received at 01:48 IST on 16 November 2026.
 
-New targets are supplied by the separate P5 synthesis and metrics PRs. The report
-and storyboard can be reviewed independently, then commands rerun after merging.
-Generic counts vary by tool version; retain version and hashes with each run.
+## Remaining independent/administrative verification
 
-## Before submission
+- [ ] Confirm every author’s final section/affiliation approval; do not represent absent responses as received.
+- [ ] Independently inspect the final rendered PDF page-by-page for layout and links if an updated copy is supplied.
+- [ ] Obtain a faculty decision on the disclosed **unmeasured Fmax** or perform a supported target-specific timing flow.
+- [ ] Independently play the hosted video in a signed-out browser, verify full narration and confirm original member clip handoff/consent.
+- [ ] Re-run the complete tests/synthesis/metrics on the latest merged main, if needed for the faculty's final acceptance record; the last documented full main CI suite predates PRs #13–#15.
 
-- [ ] Merge the P5 synthesis and metrics PRs and rerun their CI on main.
-- [ ] Run `make test`, `make synth-all`, `make metrics test-p5-metrics` from a clean checkout.
-- [ ] Preserve selected real tool logs and CI artifact links with the final commit.
-- [ ] Obtain all five authors' section review and confirm names/affiliations.
-- [ ] Check literature claims against the original sources and unify references.
-- [ ] Format the reviewed report in the official IEEE template and export
-      `report/Phase1_IEEE_Report.pdf`; check every page visually.
-- [ ] Record each member and assemble the 4:30–4:50 video using the storyboard.
-- [ ] Verify duration, introductions, readable captions and actual prototype proof.
-- [ ] Upload the real video; check signed-out access and add its URL to README
-      and `video/DEMO_LINK.md`.
-- [ ] Test GitHub report/evidence links and the video link as a reviewer.
-- [ ] Leader verifies actual contribution links and submits before
-      16 November 2026, 11:59 PM IST.
-
-The final report, team recordings, hosted video and leader signoff need team input.
-Maximum operating frequency is still unmeasured; decide a device/constraints flow
-with the team or explicitly state that limitation in the report.
-
-## Maintainer review follow-up
-
-The original PR-head CI runs are now successful, including P5 synthesis and
-metrics. See [the review handoff](P5_REVIEW_HANDOFF.md) for tested commits, actual
-run links, artifact verification, timing prerequisites and the member-by-member
-report/recording requests. Check the latest head's CI again after new commits.
-The README scope now identifies the BTB as implemented. All three PRs remain
-under review; the final PDF, video and clean merged-main regression remain pending.
+**Accuracy and timing caveat:** 130 branches are synthetic deterministic traces, CPI is illustrative, and Yosys generic cells are not FPGA LUTs nor frequency measurements.

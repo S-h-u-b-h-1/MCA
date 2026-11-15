@@ -4,6 +4,8 @@
 - **Phase I deadline:** 16 November 2026, 11:59 PM IST.
 - **Phase I rubric:** IEEE report (10), prototype video under five minutes (15), GitHub (5).
 - **Phase II:** final IEEE report, continuing Git history and interview (70% of overall grading).
+- **Phase I submitted:** Official Google Forms response receipt received on 16 November 2026 at 01:48 IST.
+- **Final team demonstration (4:53.7):** [Watch the video](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing).
 
 ## Scope
 
@@ -28,7 +30,7 @@ This is a **Verilog branch predictor prototype** with a 2-bit Branch History Tab
 - `make test-p4-compare`: automated reconciliation script guarantees Verilog simulation and Python oracle parity across all counts and fields before publishing evidence.
 - `make verify-p4`: full P4 simulation suite (654 checks), Yosys checked synthesis (0 problems, 92 cells for 1-bit, 284 cells for top), and dynamic VCD waveform generation completed.
 - P5 synthesis automation, validated metrics and report/video handoff merged in PRs #5–#7; six workflows passed on combined main commit `97c8290`.
-- Final QA PR #8 merged a synthesizable P1/P2/P3 wrapper and self-checking 16/32-entry integration regression (140/140 checks [passed in CI](https://github.com/S-h-u-b-h-1/MCA/actions/runs/42200408998)). The Phase I IEEE report is now committed; a final duration-compliant, accessible team video link is still pending.
+- Final QA PR #8 merged a synthesizable P1/P2/P3 wrapper and self-checking 16/32-entry integration regression (140/140 checks [passed in CI](https://github.com/S-h-u-b-h-1/MCA/actions/runs/42200408998)). The Phase I IEEE report is committed, and the final 293.7-second team demonstration is [hosted on Google Drive](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing).
 
 ## Mac setup
 
@@ -76,7 +78,8 @@ Read `docs/INTERFACES.md` first, then `docs/PROJECT_PLAN.md`, then your own guid
 
 - Use the [official IEEE conference templates](https://conferences.ieeeauthorcenter.ieee.org/write-your-paper/authoring-tools-and-templates/) unless faculty provides a specific local variant.
 - **Final Phase I IEEE report:** [`report/Phase1_IEEE_Report.pdf`](report/Phase1_IEEE_Report.pdf) (approved for coursework submission by the team lead).
-- Put a public/accessible video link in `video/DEMO_LINK.md` and README; don't commit a large MP4 to Git.
+- **Final Phase I video:** [MCA team demonstration — 4 minutes 53.7 seconds](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing). The Google Drive file is shared **Anyone with the link → Viewer**; do not commit the MP4 to Git.
+- [Demo access and media verification notes](video/DEMO_LINK.md).
 - Confirm every team member appears in the video and has substantive commits and a report contribution.
 - Submission form: https://docs.google.com/forms/d/e/1FAIpQLSc6Cx8OrOQLGj_X2ZMkyG5jc8mokq36mGRq2x8jGRNV1sbegA/viewform
 
@@ -94,7 +97,7 @@ The two existing P1 RTL files were intentionally **left unchanged** from the
 
 - [Faculty Project 5 and Phase I/II checklist](docs/FACULTY_REQUIREMENTS.md): completed evidence versus outstanding deliverables.
 - [Start here for all teammates](docs/TEAM_START_HERE.md): forking, cloning, assigned branches and integration requirements; no collaborator invitation required.
-- P1–P5, BPU QA (#8), BTB evidence (#13), P1/P3/BPU waveform evidence (#14), and IEEE report (#15) are merged. This is a branch-prediction prototype, not a full CPU. Target-specific Fmax is unmeasured; the final video link is pending.
+- P1–P5, BPU QA (#8), BTB evidence (#13), P1/P3/BPU waveform evidence (#14), and IEEE report (#15) are merged. This is a branch-prediction prototype, not a full CPU. Target-specific Fmax remains unmeasured. The final video is linked above, and the Phase I form submission receipt was received on 16 November 2026.
 
 ## P5 evaluation and submission handoff
 
@@ -116,4 +119,4 @@ make metrics test-p5-metrics
 - [P5 report contribution](report/P5_REPORT_SECTION.md) and [author handoff](report/PHASE1_REPORT_OUTLINE.md).
 - [Video capture plan](video/DEMO_STORYBOARD.md), [submission checklist](docs/P5_SUBMISSION_CHECKLIST.md), and [BPU integration signoff](docs/BPU_RELEASE_SIGNOFF.md).
 
-The [Phase I IEEE report](report/Phase1_IEEE_Report.pdf) is committed. Add the **verified, under-five-minute** hosted video URL here and in `video/DEMO_LINK.md` after final editing and signed-out access testing; no final video is currently claimed.
+The [Phase I IEEE report](report/Phase1_IEEE_Report.pdf) is committed. The [final team demonstration](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing) is 4:53.7 (measured using `ffprobe`) and is also linked from [`video/DEMO_LINK.md`](video/DEMO_LINK.md). The form is submitted. Formal five-author acknowledgments and a faculty timing/Fmax decision are separate evidence gates, not claimed as complete here.
