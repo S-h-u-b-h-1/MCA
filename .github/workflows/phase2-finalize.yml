@@ -42,7 +42,7 @@ jobs:
           test "$pages" -ge 2 && test "$pages" -le 8
           pdftotext report/Phase2_Final_IEEE_Report.pdf report/Phase2_Final_IEEE_Report.extract.txt
           grep -F 'Tanish Yadav' report/Phase2_Final_IEEE_Report.extract.txt
-          grep -Fi 'Conclusion' report/Phase2_Final_IEEE_Report.extract.txt
+          grep -Eiq 'C[[:space:]]*ONCLUSION' report/Phase2_Final_IEEE_Report.extract.txt
           grep -Fi 'unmeasured' report/Phase2_Final_IEEE_Report.extract.txt
           rm -f report/Phase2_Final_IEEE_Report.extract.txt
       - name: Preserve compiled IEEE report as workflow artifact
