@@ -1,17 +1,11 @@
 # MCA — Dynamic Branch Prediction Unit (Project 5)
 
-- **Team:** Shubhaang (leader / P1), Tanish (P2), Tanmay (P3), Vansh (P4), Lakshya (P5).
-- **Phase I deadline:** 16 November 2026, 11:59 PM IST.
-- **Phase I rubric:** IEEE report (10), prototype video under five minutes (15), GitHub (5).
-- **Phase II:** [Final IEEE report](report/Phase2_Final_IEEE_Report.pdf), [source](report/Phase2_Final_IEEE_Report.tex), and [15-minute live viva runbook](docs/PHASE2_LIVE_VIVA_RUNBOOK.md). Phase II evaluation: 24 November 2026, 1:45–2:00 PM, A410.
-- **Phase II evaluation:** Tuesday **24 November 2026**, **1:45–2:00 PM IST**, **Room A410**, Team `master-slave`, Section C. All five members must be present.
-- **Phase II final technical paper:** [IEEEtran report PDF](report/Phase2_Final_IEEE_Report.pdf) and [LaTeX source](report/Phase2_Final_IEEE_Report.tex) (generated on main by the [Phase II verification workflow](.github/workflows/phase2-finalize.yml)); Phase I report remains preserved.
-- **Live viva preparation:** [15-minute member-by-member runbook, demo commands, exact metrics and honest limitations](docs/PHASE2_LIVE_VIVA_RUNBOOK.md).
-- **Scope/timing:** This is a verified prediction subsystem, not a complete CPU. FPGA Fmax is unmeasured without a specified part, constraints and place-and-route report. Newly run CI should be judged by actual latest workflow results.
-
-- **Phase I submitted:** Official Google Forms response receipt received on 16 November 2026 at 01:48 IST.
-- **Phase II virtual FPGA timing:** [verified iCE40HX8K post-route estimate](evidence/fpga_timing/POSTROUTE_RESULT.md) — **93.22 MHz** for an I/O-registered BPU wrapper (25 MHz target passed); **not** an actual board measurement.
-- **Final team demonstration (4:53.7):** [Watch the video](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing).
+- **Team:** Shubhaang (leader/P1), Tanish (P2), Tanmay (P3), Vansh (P4), Lakshya (P5).
+- **Phase I:** IEEE report, [4:53.7 team video](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing), and official Google Form submitted on 16 November 2026.
+- **Phase II evaluation:** Tuesday **24 November 2026**, **1:45–2:00 PM IST**, **Room A410**, team `master-slave`, Section C. **All five members must attend.**
+- **Phase II final deliverables:** [IEEE report (PDF)](report/Phase2_Final_IEEE_Report.pdf), [editable LaTeX source](report/Phase2_Final_IEEE_Report.tex), [live viva runbook](docs/PHASE2_LIVE_VIVA_RUNBOOK.md) and [final engineering release status](docs/PHASE2_RELEASE_STATUS.md).
+- **Mapped FPGA timing:** [Lattice iCE40HX8K-CT256 software post-route study](evidence/fpga_timing/POSTROUTE_RESULT.md) estimates **93.22 MHz** for a registered wrapper around the verified BPU (25 MHz goal passed), with **427 LUT4s, 279 FFs, 56 carry cells and 4 RAM blocks**. **This is not a physical-board measurement.**
+- **Scope and qualification:** Verified synthesizable *branch-prediction subsystem*, not a complete CPU. A physical board/pinout timing study and written MCA faculty acceptance of this virtual FPGA method remain pending.
 
 ## Scope
 
