@@ -10,6 +10,7 @@
 - **Scope/timing:** This is a verified prediction subsystem, not a complete CPU. FPGA Fmax is unmeasured without a specified part, constraints and place-and-route report. Newly run CI should be judged by actual latest workflow results.
 
 - **Phase I submitted:** Official Google Forms response receipt received on 16 November 2026 at 01:48 IST.
+- **Phase II virtual FPGA timing:** [verified iCE40HX8K post-route estimate](evidence/fpga_timing/POSTROUTE_RESULT.md) — **93.22 MHz** for an I/O-registered BPU wrapper (25 MHz target passed); **not** an actual board measurement.
 - **Final team demonstration (4:53.7):** [Watch the video](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing).
 
 ## Scope
