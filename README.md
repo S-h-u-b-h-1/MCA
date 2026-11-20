@@ -4,6 +4,7 @@
 - **Phase I:** IEEE report, [4:53.7 team video](https://drive.google.com/file/d/1keXnkWQt3XM15Cudw4f7V6h63R3U_sLU/view?usp=sharing), and official Google Form submitted on 16 November 2026.
 - **Phase II evaluation:** Tuesday **24 November 2026**, **1:45–2:00 PM IST**, **Room A410**, team `master-slave`, Section C. **All five members must attend.**
 - **Phase II final deliverables:** [IEEE report (PDF)](report/Phase2_Final_IEEE_Report.pdf), [editable LaTeX source](report/Phase2_Final_IEEE_Report.tex), [live viva runbook](docs/PHASE2_LIVE_VIVA_RUNBOOK.md) and [final engineering release status](docs/PHASE2_RELEASE_STATUS.md).
+- **Team preparation materials:** [Phase II team preparation guide](docs/MCA_Project_5_Phase_II_Team_Preparation_Guide.md), [one-page viva cheat sheet](docs/MCA_Project_5_Phase_II_One_Page_Viva_Cheat_Sheet.md) and [offline viva pack index](docs/MCA_Project_5_Phase_II_Offline_Viva_Pack_README.md). Formatted PDF/DOCX and offline ZIP are distributed separately.
 - **Mapped FPGA timing:** [Lattice iCE40HX8K-CT256 software post-route study](evidence/fpga_timing/POSTROUTE_RESULT.md) estimates **93.22 MHz** for a registered wrapper around the verified BPU (25 MHz goal passed), with **427 LUT4s, 279 FFs, 56 carry cells and 4 RAM blocks**. **This is not a physical-board measurement.**
 - **Scope and qualification:** Verified synthesizable *branch-prediction subsystem*, not a complete CPU. A physical board/pinout timing study and written MCA faculty acceptance of this virtual FPGA method remain pending.
 
