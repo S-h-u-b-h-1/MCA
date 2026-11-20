@@ -1,5 +1,7 @@
 # Faculty requirements and evidence gates — MCA Project 5
 
+> **Phase II update, 20 Nov 2026:** A **software iCE40HX8K-CT256 post-route Fmax estimate of 93.22 MHz** is verified for a registered wrapper around the unchanged BPU. Resource use is 427 mapped LUT4s, 279 FFs, 56 carry and 4 RAM blocks, with 25 MHz requested clock passed. See [timing evidence](../evidence/fpga_timing/POSTROUTE_RESULT.md). Physical-board Fmax is **unmeasured**, and course faculty acceptance of the target/constraints is still pending. The historical Phase I checklist below remains a record of the earlier stage.
+
 **Source:** [Modern Computer Architecture Project 5](https://docs.google.com/document/d/1CoQOY3T4p0qY1B9qR3WPh8I93aCyN-zIs9VF17kBMNU/edit).
 Phase I deadline: **16 November 2026, 11:59 PM IST**.
 
