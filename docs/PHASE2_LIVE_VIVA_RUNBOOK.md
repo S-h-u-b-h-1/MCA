@@ -46,7 +46,7 @@ On mixed BEQ/BNE, changing from a 16-entry to a 32-entry BHT improved two-bit co
 
 **Illustrative (not measured) CPI:** `CPI = 1 + 0.2 × misprediction_rate × 3`. Always NT 1.378462; one bit 1.383077; two bit 1.346154.
 
-**Generic Yosys 0.33 cells:** BPU 2,993, BTB 2,498, two-bit predictor 162. These are separately synthesized tops and must not be added. A separate Yosys 0.70+post capture showed 2,907 BPU generic cells; the difference reflects distinct tool versions. Neither is FPGA LUT usage or maximum operating frequency.
+**Generic Yosys 0.33 cells:** BPU 2,993, BTB 2,498, two-bit predictor 162. These separately synthesized top counts must not be added. A different Yosys 0.70+post video run showed 2,907 generic BPU cells. **New device-specific estimate:** the unchanged BPU inside a registered I/O timing harness mapped to iCE40HX8K-CT256 achieved **93.22 MHz software-estimated post-route Fmax**, 427 LUT4s, 279 FFs, 56 carry cells and 4 RAM40 blocks; requested clock 25 MHz met. [Evidence](../evidence/fpga_timing/POSTROUTE_RESULT.md). Neither is physically measured board frequency.
 
 ## Demonstration commands
 
@@ -79,13 +79,13 @@ For a quick viva run, start with `make test-bpu`, then show `evidence/waveforms/
 - **What is flush?** A request to discard younger wrong-path work; a full CPU would implement detailed stage kills outside this BPU.
 - **What was tested?** Directed self-checking SystemVerilog for counter, target, recovery and integrated wrapper, plus an independent Python model.
 - **Why is CPI not measured?** No full CPU program execution; branch fraction and penalty are assumed.
-- **What is Fmax?** Maximum supported operating clock under a specified mapped device/constraints/timing flow. Our Fmax is unmeasured.
+- **What is Fmax?** Highest supported clock under a device-specific implementation/timing model. Our **registered BPU wrapper's software post-route estimate is 93.22 MHz** on iCE40HX8K-CT256. Actual physical board Fmax remains unmeasured.
 - **How improve?** Real five-stage integration, actual instruction traces, gshare, mapped FPGA timing and power/area analysis.
 
 ## Before 24 November — responsible signoffs
 
 - [ ] Shubhaang: run latest complete `main` CI/tests, review the Phase II report and rehearse opening/cross-questions.
-- [ ] Tanish: verify surname as on official evaluation notice, demonstrate BTB hit/tag collision; avoid claiming a measured MHz.
+- [ ] Tanish: verify surname as on official evaluation notice, demonstrate BTB hit/tag collision; explain the 93.22 MHz **software routing estimate** and why physical Fmax is still unmeasured.
 - [ ] Tanmay: rehearse one direction error and one wrong-target recovery from saved metadata.
 - [ ] Vansh: demonstrate source counts, show the 2-bit counterexample (alternating 0/40), and confirm final five-member video ownership.
 - [ ] Lakshya: verify all five displayed author details and Phase II final report, explain Yosys tool-version difference and model-only CPI.
