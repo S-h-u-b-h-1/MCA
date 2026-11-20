@@ -3,7 +3,7 @@
 - **Team:** Shubhaang (leader / P1), Tanish (P2), Tanmay (P3), Vansh (P4), Lakshya (P5).
 - **Phase I deadline:** 16 November 2026, 11:59 PM IST.
 - **Phase I rubric:** IEEE report (10), prototype video under five minutes (15), GitHub (5).
-- **Phase II:** final IEEE report, continuing Git history and interview (70% of overall grading).
+- **Phase II:** [Final IEEE report](report/Phase2_Final_IEEE_Report.pdf), [source](report/Phase2_Final_IEEE_Report.tex), and [15-minute live viva runbook](docs/PHASE2_LIVE_VIVA_RUNBOOK.md). Phase II evaluation: 24 November 2026, 1:45–2:00 PM, A410.
 - **Phase II evaluation:** Tuesday **24 November 2026**, **1:45–2:00 PM IST**, **Room A410**, Team `master-slave`, Section C. All five members must be present.
 - **Phase II final technical paper:** [IEEEtran report PDF](report/Phase2_Final_IEEE_Report.pdf) and [LaTeX source](report/Phase2_Final_IEEE_Report.tex) (generated on main by the [Phase II verification workflow](.github/workflows/phase2-finalize.yml)); Phase I report remains preserved.
 - **Live viva preparation:** [15-minute member-by-member runbook, demo commands, exact metrics and honest limitations](docs/PHASE2_LIVE_VIVA_RUNBOOK.md).
