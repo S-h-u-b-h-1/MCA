@@ -21,7 +21,7 @@ MCA Project 5 \textbar{} Team: master-slave}}
 \maketitle
 
 \begin{abstract}
-Conditional branches introduce control hazards when the next fetch address must be selected before a branch resolves. We designed and verified a synthesizable Verilog branch prediction subsystem that combines a two-bit saturating-counter branch history table (BHT), a tagged branch target buffer (BTB), speculative next-program-counter selection and a misprediction recovery interface. The baseline study evaluates always-not-taken, one-bit and two-bit direction prediction on 130 dynamic branches from three deterministic synthetic traces. The two-bit predictor correctly predicts 55/130 branches (42.31\%) overall, compared with 48/130 (36.92\%) for always-not-taken and 47/130 (36.15\%) for one-bit prediction; on the loop trace it predicts 31/40 correctly (77.50\%). An independent Python reference model reconciles with the Verilog comparison. The integrated BPU has 140 documented directed verification checks across 16- and 32-entry configurations, and the committed Yosys 0.33 flow reports 2,993 generic cells for its integrated top. Reported CPI is analytical and assumption-based; a complete CPU, device-mapped resource utilization, maximum operating frequency and application speedup have not been measured.
+Conditional branches introduce control hazards when the next fetch address must be selected before a branch resolves. We designed and verified a synthesizable Verilog branch prediction subsystem that combines a two-bit saturating-counter branch history table (BHT), a tagged branch target buffer (BTB), speculative next-program-counter selection and a misprediction recovery interface. The baseline study evaluates always-not-taken, one-bit and two-bit direction prediction on 130 dynamic branches from three deterministic synthetic traces. The two-bit predictor correctly predicts 55/130 branches (42.31\%) overall, compared with 48/130 (36.92\%) for always-not-taken and 47/130 (36.15\%) for one-bit prediction; on the loop trace it predicts 31/40 correctly (77.50\%). An independent Python reference model reconciles with the Verilog comparison. The integrated BPU has 140 documented directed verification checks across 16- and 32-entry configurations, and the committed Yosys 0.33 flow reports 2,993 generic cells for its integrated top. Reported CPI is analytical and assumption-based. A separate registered-I/O iCE40HX8K-CT256 software place-and-route study estimates the BPU harness clock Fmax at 93.22~MHz; this is not a physical board measurement, CPU throughput or application speedup.
 \end{abstract}
 \begin{IEEEkeywords}
 branch prediction, branch history table, branch target buffer, Verilog, pipeline hazards, trace-driven verification
@@ -160,12 +160,52 @@ RTL top (independently synthesized) & Generic cells \\
 
 Each top was synthesized and checked separately under Yosys 0.33; the top counts must not be added together. The Phase I video shows a different local Yosys 0.70+post run with 2,907 generic cells for the integrated BPU. Differences between tool versions/flows are not a controlled cost comparison. The 2,993 figure in Table~\ref{tab:synthesis} refers exclusively to the pinned Yosys 0.33 evidence \cite{repo}. Neither result represents technology-mapped FPGA LUT utilization or maximum MHz.
 
+\subsection{Mapped FPGA timing (software estimate)}
+We mapped the unchanged BPU in a registered-input/output wrapper to a
+Lattice iCE40HX8K-CT256 with Yosys 0.33 and nextpnr-ice40 0.6.
+With a requested 25~MHz clock goal and seed one, nextpnr reported a
+\textbf{93.22~MHz post-route estimate} (10.73~ns period); the goal
+was met \cite{fpga}. This is a clocked-harness timing estimate,
+not a physical board measurement.
+
+\begin{table}[t]
+\caption{FPGA resources and clock estimate for registered BPU harness}
+\label{tab:fpga}
+\centering
+\begin{tabular}{@{}lr@{}}
+\toprule
+Software post-route metric & Result \\
+\midrule
+Estimated Fmax / period & 93.22 MHz / 10.73 ns \\
+Requested clock goal & 25.00 MHz (met) \\
+Mapped LUT4s / flip-flops & 427 / 279 \\
+Carry primitives / RAM40 blocks & 56 / 4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The critical path runs from BTB tag RAM through lookup/next-PC
+selection into an observation register (about 4.5~ns logic plus
+6.3~ns routing). Detailed routing logs and source hashes are archived
+in the successful GitHub Actions run \cite{fpga}.
+
+
 \section{Limitations and Future Work}
-This is a prediction subsystem with simulation-based integration, not a complete IF--ID--EX--MEM--WB CPU. The study uses only three deterministic synthetic trace patterns and a defined cold-start condition. Its BHT is direct-indexed and untagged; the BTB is direct-mapped. An actual processor would supply prediction-metadata registers, execute-stage outcomes, instruction kills and measured instruction streams. The model excludes these components and cannot establish processor throughput or application speedup.
+The prototype is a prediction subsystem, not a full five-stage CPU.
+Accuracy uses three synthetic traces under cold-start conditions;
+neither measured processor CPI nor application speedup is established.
+An actual processor must manage prediction metadata, instruction
+kills, external clocking and realistic instruction streams.
 
-\textbf{Maximum operating frequency (Fmax) is unmeasured.} No FPGA family, exact part/speed grade, place-and-route toolchain or clock/I/O constraints were specified. Generic Yosys cells and a testbench stimulus such as \texttt{always \#5 clk} cannot establish 100 MHz. A defensible hardware-frequency result requires selecting a target, technology mapping, constrained place-and-route and an archived timing report. This requirement should be discussed with faculty before claiming final acceptance \cite{faculty}.
+\textbf{Physical-board Fmax remains unmeasured.} Our
+93.22~MHz estimate is specific to the registered harness and its
+iCE40 place-and-route timing model. No physical board was programmed,
+and no board PCF, external I/O delay or load constraints, or
+voltage/temperature corners were provided. University faculty must
+confirm whether this board-less study meets their Fmax requirement
+\cite{faculty}. Further work includes board-specific constraints,
+realistic pipeline integration and more representative traces.
 
-Future work can integrate the BPU into an actual five-stage pipeline, evaluate representative application traces, explore gshare/tournament predictors and BTB capacity tradeoffs, and perform device-specific power, area and timing analysis. The next engineering step should be measured evidence rather than an assumed speedup.
 
 \balance
 \section{Individual Contributions}
@@ -176,13 +216,28 @@ Future work can integrate the BPU into an actual five-stage pipeline, evaluate r
 \textbf{Lakshya (P5):} synthesis automation, count/accuracy/CPI reconciliation, charts, technical report/video assembly. These contributions reflect the recorded repository artifacts and do not imply separate coauthor approval of this Phase II manuscript.
 
 \section{Conclusion}
-We designed and integrated a synthesizable branch-prediction subsystem that separates direction prediction, target lookup and recovery. Self-checking RTL verification covers state changes, BTB collisions, invalid updates and saved fetch-time metadata. Across 130 deterministic synthetic branch outcomes, the two-bit predictor achieves 42.31\% overall direction accuracy and 77.50\% on the loop-like trace, while an alternating counterexample demonstrates that higher complexity does not always improve prediction. Generic synthesis and illustrative CPI calculations quantify selected aspects of the prototype without claiming an FPGA timing result or measured CPU performance. The next meaningful validation is a device-constrained timing study and realistic pipeline integration.
+We built and verified a synthesizable direction/target prediction
+subsystem with saved-metadata recovery. The two-bit predictor achieved
+55/130 correct predictions overall (42.31\%) and 31/40 on the
+loop-like trace; strict alternation exposed a failure case.
+A separate registered-harness FPGA flow estimated 93.22~MHz
+post-route on iCE40HX8K-CT256, without asserting a physical-board
+clock, measured CPU CPI or application speedup.
+
 
 \section*{Reproducibility Note}
-Repository: \url{https://github.com/S-h-u-b-h-1/MCA}. Mainline source and documentation were checked on 20 November 2026 at commit \texttt{d4f814c}. The last historically documented complete main-branch GitHub Actions suite preceded the Phase I report merge; any newer CI results should be cited only after successful run completion. Suggested commands: \texttt{make test}, \texttt{make test-bpu}, \texttt{make metrics test-p5-metrics}, and \texttt{make synth-all}. Recorded output files include \path{evidence/metrics/comparison_summary.csv}, \path{accuracy.csv} and \path{evidence/synthesis/summary.md}.
+Source: \url{https://github.com/S-h-u-b-h-1/MCA}.
+The FPGA study was verified in GitHub Actions run
+\texttt{44777766230}, retaining the RTL hashes, mapped primitives,
+placed/routed design and timing logs. Reproduce with
+\texttt{make test-bpu}, \texttt{make test},
+\texttt{make metrics test-p5-metrics}, and
+\texttt{bash scripts/run\_fpga\_timing.sh}.
+
 
 \begin{thebibliography}{00}
 \bibitem{repo} MCA Project 5 team, ``Dynamic Branch Prediction Unit: RTL, testbenches, traces and evidence,'' public project repository, Nov. 2026. [Online]. Available: \url{https://github.com/S-h-u-b-h-1/MCA}
+\bibitem{fpga} MCA Project 5 team, \emph{iCE40HX8K post-route FPGA Fmax study}, evidence checked 20 Nov. 2026. Repository: \url{https://github.com/S-h-u-b-h-1/MCA/blob/main/evidence/fpga_timing/POSTROUTE_RESULT.md}. Workflow: \url{https://github.com/S-h-u-b-h-1/MCA/actions/runs/44777766230}.
 \bibitem{faculty} Rishihood University, ``Modern Computer Architecture: Project 5---Dynamic Branch Prediction Unit,'' course project specification, 2026.
 \bibitem{smith} J. E. Smith, ``A Study of Branch Prediction Strategies,'' in \emph{Proc. 8th International Symposium on Computer Architecture (ISCA)}, 1981, pp. 135--148.
 \bibitem{lee} J. K. F. Lee and A. J. Smith, ``Analysis of Branch Prediction Strategies and Branch Target Buffer Design,'' University of California, Berkeley, Tech. Rep. UCB/CSD-83-121, Aug. 1983.

@@ -3,12 +3,14 @@ name: Phase II final report and full verification
 on:
   pull_request:
     paths:
+      - "report/Phase2_Final_IEEE_Report.tex"
       - "report/Phase2_Final_IEEE_Report.tex.gz.b64"
       - "docs/PHASE2_LIVE_VIVA_RUNBOOK.md"
       - ".github/workflows/phase2-finalize.yml"
   push:
     branches: [main]
     paths:
+      - "report/Phase2_Final_IEEE_Report.tex"
       - "report/Phase2_Final_IEEE_Report.tex.gz.b64"
       - ".github/workflows/phase2-finalize.yml"
   workflow_dispatch:
@@ -26,11 +28,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends latexmk texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-publishers texlive-fonts-recommended poppler-utils
-      - name: Decode and verify authored IEEEtran source
+      - name: Verify authoritative checked-in IEEEtran source
         run: |
-          base64 --decode report/Phase2_Final_IEEE_Report.tex.gz.b64 | gzip -d > report/Phase2_Final_IEEE_Report.tex
-          echo "31094195c5c6d8eb7119432b6a4fcfcd28443e91ec5aef649a39773a28b9b03e  report/Phase2_Final_IEEE_Report.tex" | sha256sum --check
+          test -s report/Phase2_Final_IEEE_Report.tex
           grep -F 'IEEEtran' report/Phase2_Final_IEEE_Report.tex
+          sha256sum report/Phase2_Final_IEEE_Report.tex
       - name: Build final Phase II report
         run: |
           cd report
