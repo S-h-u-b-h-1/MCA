@@ -1,0 +1,190 @@
+\documentclass[conference,a4paper]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{balance}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+
+\title{Design, Integration and Verification of a Dynamic Branch Prediction Unit}
+\author{\IEEEauthorblockN{Shubhaang Kataruka, Tanish Yadav, Tanmay Singh, Vansh Panwar and Lakshya}
+\IEEEauthorblockA{B.Tech. Computer Science and Artificial Intelligence\\
+Newton School of Technology, Rishihood University\\
+Sonipat, Haryana, India\\
+MCA Project 5 \textbar{} Team: master-slave}}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Conditional branches introduce control hazards when the next fetch address must be selected before a branch resolves. We designed and verified a synthesizable Verilog branch prediction subsystem that combines a two-bit saturating-counter branch history table (BHT), a tagged branch target buffer (BTB), speculative next-program-counter selection and a misprediction recovery interface. The baseline study evaluates always-not-taken, one-bit and two-bit direction prediction on 130 dynamic branches from three deterministic synthetic traces. The two-bit predictor correctly predicts 55/130 branches (42.31\%) overall, compared with 48/130 (36.92\%) for always-not-taken and 47/130 (36.15\%) for one-bit prediction; on the loop trace it predicts 31/40 correctly (77.50\%). An independent Python reference model reconciles with the Verilog comparison. The integrated BPU has 140 documented directed verification checks across 16- and 32-entry configurations, and the committed Yosys 0.33 flow reports 2,993 generic cells for its integrated top. Reported CPI is analytical and assumption-based; a complete CPU, device-mapped resource utilization, maximum operating frequency and application speedup have not been measured.
+\end{abstract}
+\begin{IEEEkeywords}
+branch prediction, branch history table, branch target buffer, Verilog, pipeline hazards, trace-driven verification
+\end{IEEEkeywords}
+
+\section{Introduction}
+A pipelined processor overlaps instruction fetch, decode, execute, memory access and write-back. A conditional branch (such as BEQ or BNE) can change the next instruction address, but its actual direction may not be available when the fetch stage needs an address. Waiting for branch resolution can waste fetch opportunities; speculative prediction instead chooses a likely next PC. An incorrect choice requires the machine to discard younger wrong-path instructions and redirect fetch.
+
+This work targets the branch-prediction component of that problem, rather than implementing a complete processor. The project comprises independent direction, target and recovery blocks integrated behind a synthesizable BPU interface, together with trace-driven tests, waveforms and generic logic synthesis. It follows the course's Project 5 requirements for dynamic prediction, state transitions, BEQ/BNE traces and baseline comparison \cite{faculty,repo}.
+
+\section{Related Work and Design Rationale}
+Smith's branch-prediction study examined static and dynamic history-based strategies on instruction traces \cite{smith}. The always-not-taken baseline requires no learned direction state, while a one-bit predictor reuses the last observed outcome. A two-bit saturating counter adds hysteresis: one isolated opposite outcome can lower confidence without immediately reversing a strongly held direction prediction. Lee and Smith investigated branch-prediction and target-buffer design considerations \cite{lee}. Our instructional implementation combines a small two-bit BHT for direction with a direct-mapped, tagged BTB for target lookup. Its purpose is reproducible hardware verification and controlled comparison, not reproducing the absolute performance of a modern processor.
+
+\section{Microarchitecture and Operation}
+\subsection{Direction prediction with a two-bit BHT}
+The default BHT has $2^{4}=16$ entries with two bits per entry (32 counter-storage bits). Aligned 32-bit instruction addresses use PC bits $[5:2]$ as the index. The 16 counters are synchronously reset to binary \texttt{01}, or weakly not taken. The most significant counter bit generates the prediction; a valid resolved branch increments or decrements its counter toward the saturating endpoints \texttt{11} and \texttt{00}. Table~\ref{tab:states} specifies the complete state transition function.
+
+\begin{table}[t]
+\caption{Two-bit saturating BHT state transitions}
+\label{tab:states}
+\centering
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+State & Meaning & Predict & Taken $\to$ & NT $\to$ \\
+\midrule
+\texttt{00} & Strong NT & NT & \texttt{01} & \texttt{00} \\
+\texttt{01} & Weak NT & NT & \texttt{10} & \texttt{00} \\
+\texttt{10} & Weak T & T & \texttt{11} & \texttt{01} \\
+\texttt{11} & Strong T & T & \texttt{11} & \texttt{10} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two-bit hysteresis means that one contrary result can weaken a strong prediction without immediately reversing its direction. Because the BHT is untagged, different PCs sharing the same index may interfere. For example, \texttt{0x100} and \texttt{0x140} both index entry 0 in the 16-entry configuration.
+
+\subsection{Tagged BTB and next-PC selection}
+The direct-mapped BTB has 16 default entries, each storing a valid bit, the upper PC tag bits and a 32-bit branch target. The index is PC$[5:2]$, and the tag is PC$[31:6]$. A lookup is a hit only when the entry is valid and the tag matches; a colliding PC with another tag replaces the earlier entry when a qualifying taken-branch update occurs. Reset clears valid bits.
+
+At fetch time, direction and target lookups are combined:
+\begin{equation}
+PC_{\mathrm{spec}}=\begin{cases}
+BTB_{\mathrm{target}},&\hat{T}\wedge BTB_{\mathrm{hit}}\\
+PC+4,&\text{otherwise.}
+\end{cases}
+\label{eq:nextpc}
+\end{equation}
+The PC$+4$ fallback assumes aligned four-byte instructions and does not model compressed instructions.
+
+\subsection{Resolution and recovery interface}
+The resolving branch supplies its \emph{saved fetch-time} direction prediction, BTB hit and target along with the actual outcome. Those saved values are required because the live BHT and BTB lookups can correspond to a different, younger branch. The correct resolved next address is $PC_{\mathrm{actual}}=T?target:(PC+4)$, and the recovery condition is
+\begin{equation}
+\begin{split}
+M={}&V\land\big[(\hat{T}\ne T)\\
+&\lor(T\land(\neg BTB_{\mathrm{hit}}\lor\hat{A}\ne A))\big],
+\end{split}
+\label{eq:mispredict}
+\end{equation}
+where $V$ is resolution validity, $\hat{T}$ and $T$ are predicted and actual direction, and $\hat{A}$ and $A$ are predicted and actual targets. A misprediction asserts \texttt{flush} and \texttt{redirect}, setting \texttt{redirect\_pc} to the correct next address. Recovery overrides simultaneous speculation. Only valid branches train the BHT; only valid actually taken branches train the BTB. Invalid or squashed resolutions cannot train or redirect. External pipeline registers and instruction-kill distribution are outside this wrapper.
+
+\begin{figure}[t]
+\centering
+\setlength{\fboxsep}{4pt}
+\begin{tabular}{c}
+\fbox{\parbox{0.83\columnwidth}{\centering Fetch PC (branch address)}}\\[3pt]
+$\swarrow\qquad\qquad\searrow$\\[-1pt]
+\begin{tabular}{cc}
+\fbox{\parbox{0.35\columnwidth}{\centering Two-bit BHT\\Direction}} &
+\fbox{\parbox{0.35\columnwidth}{\centering Tagged BTB\\Target/hit}}
+\end{tabular}\\[3pt]
+$\searrow\qquad\qquad\swarrow$\\[-1pt]
+\fbox{\parbox{0.83\columnwidth}{\centering Next-PC selector: predicted target or PC+4}}\\[3pt]
+$\downarrow$\\[-1pt]
+\fbox{\parbox{0.83\columnwidth}{\centering Resolve against saved fetch metadata\\Mispredict $\rightarrow$ flush / redirect $\rightarrow$ corrected PC}}\\
+\end{tabular}
+\caption{Integrated BPU control path. The caller retains fetch-time metadata until resolution; the block is not a complete CPU.}
+\label{fig:architecture}
+\end{figure}
+
+\section{Implementation and Verification}
+The synthesizable modules are \texttt{branch\_history\_table.v}, \texttt{predictor\_2bit.v}, \texttt{branch\_target\_buffer.v}, \texttt{next\_pc\_mux.v}, \texttt{branch\_resolution.v} and the integrated \texttt{branch\_prediction\_unit.v}. An independent one-bit predictor and an always-not-taken baseline support controlled comparisons. Icarus Verilog compiles the RTL and self-checking testbenches; Python validates branch traces and independently models prediction; VCD waveforms expose counter updates, target hits, flush and redirect; Yosys checks generic synthesis \cite{repo}.
+
+The recorded P1 verification included 22 directed checks, 184 extended checks and 27,729 independent scoreboard checks across 4-, 16- and 32-entry BHT configurations. The P3 control tests recorded 24 directed and 26 interface-integration checks. P4 recorded 113 predictor-unit and 541 comparison checks. The integrated BPU test recorded 70 checks at each of 16 and 32 entries (140 total), covering reset, correct directions, wrong targets, tag collisions, invalid/squashed branches, saved metadata under concurrent fetch and redirect priority \cite{repo}. These are documented results of specific runs, not a claim of exhaustive verification of all possible execution traces.
+
+The \texttt{make test-p4-compare} path compares the HDL results with an independent Python oracle before publishing source counts. Prediction is sampled \emph{before} updating history with that same branch's actual result, preventing future-outcome leakage. The committed waveforms and test evidence support reproduction without a physical FPGA.
+
+\section{Results and Discussion}
+\subsection{Direction accuracy on identical synthetic traces}
+Three deterministic branch sequences were used: a 40-branch loop-like sequence, a 40-branch strict alternating sequence and a 50-branch mixed BEQ/BNE sequence with intentional index aliasing. Table~\ref{tab:accuracy} reports the exact committed counts. Overall percentages are computed from summed correct counts, not by averaging three workload percentages.
+
+\begin{table}[t]
+\caption{Correct direction predictions on identical branch traces}
+\label{tab:accuracy}
+\centering
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Trace & Total & Always NT & One-bit & Two-bit \\
+\midrule
+Loop-like & 40 & 8 & 24 & 31 \\
+Alternating & 40 & 20 & 0 & 0 \\
+Mixed BEQ/BNE & 50 & 20 & 23 & 24 \\
+\midrule
+Overall & 130 & 48 & 47 & 55 \\
+Accuracy (\%) & --- & 36.92 & 36.15 & 42.31 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The two-bit predictor's 31/40 = 77.50\% loop accuracy exceeds the one-bit predictor's 24/40 = 60.00\% because hysteresis tolerates isolated loop exits. Under strict alternating outcomes, however, both dynamic predictors achieve 0/40 and the static always-not-taken strategy achieves 20/40. Therefore, the two-bit predictor does not universally dominate simpler strategies. On the mixed workload, increasing BHT index capacity from 16 to 32 entries removes one intentional collision and improves the two-bit count from 24/50 (48\%) to 37/50 (74\%) under that same test. This is a workload-specific aliasing result, not a broad benchmark or claim of optimal capacity.
+
+\subsection{Illustrative CPI model}
+To show the possible architectural effect of prediction misses, the team uses the explicitly assumed model
+\begin{equation}
+CPI_{\mathrm{illustrative}} = 1 + 0.2\,r_{\mathrm{miss}}\,3,
+\end{equation}
+where ideal CPI = 1 cycle/instruction, the branch frequency = 0.2 branches/instruction and the direction-misprediction penalty = 3 cycles. From the overall counts, the illustrative CPIs are 1.378462 (always NT), 1.383077 (one bit) and 1.346154 (two bit). These are \emph{not} measured CPU CPI or speedup. Branch-target misses, data hazards and other processor costs are omitted.
+
+\subsection{Generic synthesis resources}
+\begin{table}[t]
+\caption{Committed Yosys 0.33 generic synthesis statistics}
+\label{tab:synthesis}
+\centering
+\begin{tabular}{@{}lr@{}}
+\toprule
+RTL top (independently synthesized) & Generic cells \\
+\midrule
+\texttt{predictor\_2bit} & 162 \\
+\texttt{predictor\_1bit} & 88 \\
+\texttt{branch\_target\_buffer} & 2498 \\
+\texttt{next\_pc\_mux} & 112 \\
+\texttt{branch\_resolution} & 214 \\
+\texttt{predictor\_top} & 227 \\
+\texttt{branch\_prediction\_unit} & 2993 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Each top was synthesized and checked separately under Yosys 0.33; the top counts must not be added together. The Phase I video shows a different local Yosys 0.70+post run with 2,907 generic cells for the integrated BPU. Differences between tool versions/flows are not a controlled cost comparison. The 2,993 figure in Table~\ref{tab:synthesis} refers exclusively to the pinned Yosys 0.33 evidence \cite{repo}. Neither result represents technology-mapped FPGA LUT utilization or maximum MHz.
+
+\section{Limitations and Future Work}
+This is a prediction subsystem with simulation-based integration, not a complete IF--ID--EX--MEM--WB CPU. The study uses only three deterministic synthetic trace patterns and a defined cold-start condition. Its BHT is direct-indexed and untagged; the BTB is direct-mapped. An actual processor would supply prediction-metadata registers, execute-stage outcomes, instruction kills and measured instruction streams. The model excludes these components and cannot establish processor throughput or application speedup.
+
+\textbf{Maximum operating frequency (Fmax) is unmeasured.} No FPGA family, exact part/speed grade, place-and-route toolchain or clock/I/O constraints were specified. Generic Yosys cells and a testbench stimulus such as \texttt{always \#5 clk} cannot establish 100 MHz. A defensible hardware-frequency result requires selecting a target, technology mapping, constrained place-and-route and an archived timing report. This requirement should be discussed with faculty before claiming final acceptance \cite{faculty}.
+
+Future work can integrate the BPU into an actual five-stage pipeline, evaluate representative application traces, explore gshare/tournament predictors and BTB capacity tradeoffs, and perform device-specific power, area and timing analysis. The next engineering step should be measured evidence rather than an assumed speedup.
+
+\balance
+\section{Individual Contributions}
+\textbf{Shubhaang Kataruka (P1):} two-bit predictor and BHT implementation, counter/index contract, extended tests and scoreboard verification, subsystem integration review.\\
+\textbf{Tanish Yadav (P2):} tagged BTB RTL, tag/valid/target tests, waveform evidence, timing-feasibility note.\\
+\textbf{Tanmay Singh (P3):} next-PC selection, branch-resolution and recovery logic, integrated tests and waveforms.\\
+\textbf{Vansh Panwar (P4):} one-bit baseline improvements, synthetic BEQ/BNE traces, independent Python oracle, HDL comparison and waveform analysis.\\
+\textbf{Lakshya (P5):} synthesis automation, count/accuracy/CPI reconciliation, charts, technical report/video assembly. These contributions reflect the recorded repository artifacts and do not imply separate coauthor approval of this Phase II manuscript.
+
+\section{Conclusion}
+We designed and integrated a synthesizable branch-prediction subsystem that separates direction prediction, target lookup and recovery. Self-checking RTL verification covers state changes, BTB collisions, invalid updates and saved fetch-time metadata. Across 130 deterministic synthetic branch outcomes, the two-bit predictor achieves 42.31\% overall direction accuracy and 77.50\% on the loop-like trace, while an alternating counterexample demonstrates that higher complexity does not always improve prediction. Generic synthesis and illustrative CPI calculations quantify selected aspects of the prototype without claiming an FPGA timing result or measured CPU performance. The next meaningful validation is a device-constrained timing study and realistic pipeline integration.
+
+\section*{Reproducibility Note}
+Repository: \url{https://github.com/S-h-u-b-h-1/MCA}. Mainline source and documentation were checked on 20 November 2026 at commit \texttt{d4f814c}. The last historically documented complete main-branch GitHub Actions suite preceded the Phase I report merge; any newer CI results should be cited only after successful run completion. Suggested commands: \texttt{make test}, \texttt{make test-bpu}, \texttt{make metrics test-p5-metrics}, and \texttt{make synth-all}. Recorded output files include \path{evidence/metrics/comparison_summary.csv}, \path{accuracy.csv} and \path{evidence/synthesis/summary.md}.
+
+\begin{thebibliography}{00}
+\bibitem{repo} MCA Project 5 team, ``Dynamic Branch Prediction Unit: RTL, testbenches, traces and evidence,'' public project repository, Nov. 2026. [Online]. Available: \url{https://github.com/S-h-u-b-h-1/MCA}
+\bibitem{faculty} Rishihood University, ``Modern Computer Architecture: Project 5---Dynamic Branch Prediction Unit,'' course project specification, 2026.
+\bibitem{smith} J. E. Smith, ``A Study of Branch Prediction Strategies,'' in \emph{Proc. 8th International Symposium on Computer Architecture (ISCA)}, 1981, pp. 135--148.
+\bibitem{lee} J. K. F. Lee and A. J. Smith, ``Analysis of Branch Prediction Strategies and Branch Target Buffer Design,'' University of California, Berkeley, Tech. Rep. UCB/CSD-83-121, Aug. 1983.
+\end{thebibliography}
+\end{document}
