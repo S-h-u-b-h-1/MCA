@@ -1,0 +1,73 @@
+name: FPGA mapped timing (iCE40HX8K)
+
+on:
+  pull_request:
+    paths:
+      - "rtl/fpga_timing_harness.v"
+      - "rtl/branch_*.v"
+      - "rtl/next_pc_mux.v"
+      - "rtl/predictor_2bit.v"
+      - "scripts/run_fpga_timing.sh"
+      - "scripts/report_fpga_timing.py"
+      - "tests/test_fpga_timing.py"
+      - ".github/workflows/fpga-timing.yml"
+  push:
+    branches: [main]
+    paths:
+      - "rtl/fpga_timing_harness.v"
+      - "rtl/branch_*.v"
+      - "rtl/next_pc_mux.v"
+      - "rtl/predictor_2bit.v"
+      - "scripts/run_fpga_timing.sh"
+      - "scripts/report_fpga_timing.py"
+      - ".github/workflows/fpga-timing.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fpga-postroute-estimate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install open-source FPGA tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends iverilog yosys nextpnr-ice40 python3
+          yosys -V
+          nextpnr-ice40 --version
+          iverilog -V | head -3 || true
+      - name: Verify unchanged integrated BPU behavior
+        run: make test-bpu
+      - name: Verify routed Fmax parser rejects unsupported claims
+        run: python3 -m unittest discover -s tests -p test_fpga_timing.py -v
+      - name: Run registered BPU technology mapping and place/route
+        run: bash scripts/run_fpga_timing.sh
+      - name: Check generated evidence is nonempty
+        run: |
+          test -s results/fpga_timing/bpu_fpga_timing_top.asc
+          test -s results/fpga_timing/summary.json
+          test -s results/fpga_timing/report.md
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d = json.loads(Path("results/fpga_timing/summary.json").read_text())
+          assert d["device"] == "Lattice iCE40HX8K"
+          assert d["fmax_estimate_mhz"] > 0
+          assert not d["is_physical_measurement"]
+          assert d["mapped_lut4"] >= 200
+          assert d["mapped_flip_flops"] >= 100
+          print("Verified software post-route Fmax:", d["fmax_estimate_mhz"], "MHz")
+          PY
+      - name: Archive source-hashed routing and timing evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: BPU-iCE40HX8K-Fmax-Postroute-Estimate
+          path: |
+            results/fpga_timing/
+            results/bpu_test_*.log
+          if-no-files-found: ignore
+          retention-days: 90
