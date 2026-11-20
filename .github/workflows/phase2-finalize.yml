@@ -1,0 +1,103 @@
+name: Phase II final report and full verification
+
+on:
+  pull_request:
+    paths:
+      - "report/Phase2_Final_IEEE_Report.tex.gz.b64"
+      - "docs/PHASE2_LIVE_VIVA_RUNBOOK.md"
+      - ".github/workflows/phase2-finalize.yml"
+  push:
+    branches: [main]
+    paths:
+      - "report/Phase2_Final_IEEE_Report.tex.gz.b64"
+      - ".github/workflows/phase2-finalize.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-ieee-report:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install IEEE LaTeX build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends latexmk texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-publishers texlive-fonts-recommended poppler-utils
+      - name: Decode and verify authored IEEEtran source
+        run: |
+          base64 --decode report/Phase2_Final_IEEE_Report.tex.gz.b64 | gzip -d > report/Phase2_Final_IEEE_Report.tex
+          echo "31094195c5c6d8eb7119432b6a4fcfcd28443e91ec5aef649a39773a28b9b03e  report/Phase2_Final_IEEE_Report.tex" | sha256sum --check
+          grep -F 'IEEEtran' report/Phase2_Final_IEEE_Report.tex
+      - name: Build final Phase II report
+        run: |
+          cd report
+          latexmk -pdf -interaction=nonstopmode -halt-on-error Phase2_Final_IEEE_Report.tex
+          test -s Phase2_Final_IEEE_Report.pdf
+      - name: Validate PDF content and page count
+        run: |
+          pages=$(pdfinfo report/Phase2_Final_IEEE_Report.pdf | awk '/^Pages:/ {print $2}')
+          test "$pages" -ge 2 && test "$pages" -le 8
+          pdftotext report/Phase2_Final_IEEE_Report.pdf report/Phase2_Final_IEEE_Report.extract.txt
+          grep -F 'Tanish Yadav' report/Phase2_Final_IEEE_Report.extract.txt
+          grep -Eiq 'C[[:space:]]*ONCLUSION' report/Phase2_Final_IEEE_Report.extract.txt
+          grep -Fi 'unmeasured' report/Phase2_Final_IEEE_Report.extract.txt
+          rm -f report/Phase2_Final_IEEE_Report.extract.txt
+      - name: Preserve compiled IEEE report as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MCA-Phase2-Final-IEEE-Report
+          path: |
+            report/Phase2_Final_IEEE_Report.pdf
+            report/Phase2_Final_IEEE_Report.tex
+      - name: Publish PDF and readable LaTeX source to main
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add report/Phase2_Final_IEEE_Report.tex report/Phase2_Final_IEEE_Report.pdf
+          if ! git diff --cached --quiet; then
+            git commit -m 'docs(phase2): publish compiled IEEE final report'
+            git push origin HEAD:main
+          fi
+
+  verify-hardware-and-metrics:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install RTL tools and waveform dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends iverilog yosys python3 python3-matplotlib python3-numpy python3-pil
+      - name: Record tools and source revision
+        run: |
+          git rev-parse HEAD
+          iverilog -V | head -3
+          yosys -V
+          python3 --version
+      - name: Run complete existing RTL test suite
+        run: make test
+      - name: Reconcile baseline and direction metrics
+        run: make metrics test-p5-metrics
+      - name: Run checked generic synthesis
+        run: make synth-all
+      - name: Parse and generate verified waveforms
+        run: make waveforms
+      - name: Verify committed metric outputs unchanged
+        run: git diff --exit-code -- evidence/metrics/
+      - name: Upload reproducibility logs and waveforms
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MCA-Phase2-Test-and-Synthesis-Evidence
+          path: |
+            results/
+            evidence/metrics/
+            evidence/synthesis/summary.md
+            evidence/waveforms/
+          if-no-files-found: ignore
