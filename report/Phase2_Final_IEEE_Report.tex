@@ -199,9 +199,19 @@ from the earlier 2,993 generic Yosys cells for the raw BPU.
 \section{Limitations and Future Work}
 This is a prediction subsystem with simulation-based integration, not a complete IF--ID--EX--MEM--WB CPU. The study uses only three deterministic synthetic trace patterns and a defined cold-start condition. Its BHT is direct-indexed and untagged; the BTB is direct-mapped. An actual processor would supply prediction-metadata registers, execute-stage outcomes, instruction kills and measured instruction streams. The model excludes these components and cannot establish processor throughput or application speedup.
 
-\textbf{Maximum operating frequency (Fmax) is unmeasured.} No FPGA family, exact part/speed grade, place-and-route toolchain or clock/I/O constraints were specified. Generic Yosys cells and a testbench stimulus such as \texttt{always \#5 clk} cannot establish 100 MHz. A defensible hardware-frequency result requires selecting a target, technology mapping, constrained place-and-route and an archived timing report. This requirement should be discussed with faculty before claiming final acceptance \cite{faculty}.
+\textbf{Physical-board Fmax remains unmeasured.}
+Although this report includes a verified device-specific \emph{software}
+post-route estimate (Table~\ref{tab:fpga}), no FPGA board was programmed
+and no real laboratory clock measurement was made. The timing harness
+adds input/output capture registers; no board-specific PCF/pinout,
+external input arrival delays, output loads, voltage/temperature corners,
+or complete CPU integration are modeled. Consequently the 93.22~MHz
+estimate applies only to the registered harness and selected iCE40 timing
+model, not an arbitrary board or completed CPU. Course faculty must
+confirm whether this virtual-device result meets the original maximum-
+frequency requirement \cite{faculty}.
 
-Future work can integrate the BPU into an actual five-stage pipeline, evaluate representative application traces, explore gshare/tournament predictors and BTB capacity tradeoffs, and perform device-specific power, area and timing analysis. The next engineering step should be measured evidence rather than an assumed speedup.
+Future work can integrate the BPU into an actual five-stage pipeline, evaluate representative application traces, explore gshare/tournament predictors and BTB capacity tradeoffs, and perform device-specific power, area and timing analysis. The next step is a faculty-approved target/pinout timing flow, physical board validation and realistic pipeline integration instead of an assumed speedup.
 
 \balance
 \section{Individual Contributions}
@@ -212,13 +222,14 @@ Future work can integrate the BPU into an actual five-stage pipeline, evaluate r
 \textbf{Lakshya (P5):} synthesis automation, count/accuracy/CPI reconciliation, charts, technical report/video assembly. These contributions reflect the recorded repository artifacts and do not imply separate coauthor approval of this Phase II manuscript.
 
 \section{Conclusion}
-We designed and integrated a synthesizable branch-prediction subsystem that separates direction prediction, target lookup and recovery. Self-checking RTL verification covers state changes, BTB collisions, invalid updates and saved fetch-time metadata. Across 130 deterministic synthetic branch outcomes, the two-bit predictor achieves 42.31\% overall direction accuracy and 77.50\% on the loop-like trace, while an alternating counterexample demonstrates that higher complexity does not always improve prediction. Generic synthesis and illustrative CPI calculations quantify selected aspects of the prototype without claiming an FPGA timing result or measured CPU performance. The next meaningful validation is a device-constrained timing study and realistic pipeline integration.
+We designed and integrated a synthesizable branch-prediction subsystem that separates direction prediction, target lookup and recovery. Self-checking RTL verification covers state changes, BTB collisions, invalid updates and saved fetch-time metadata. Across 130 deterministic synthetic branch outcomes, the two-bit predictor achieves 42.31\% overall direction accuracy and 77.50\% on the loop-like trace, while an alternating counterexample demonstrates that higher complexity does not always improve prediction. Generic synthesis, illustrative CPI and a verified iCE40 post-route timing estimate quantify separate aspects of the prototype without claiming physical FPGA measurement or measured CPU performance. The next validation is faculty-approved board constraints and realistic pipeline integration.
 
 \section*{Reproducibility Note}
-Repository: \url{https://github.com/S-h-u-b-h-1/MCA}. Mainline source and documentation were checked on 20 November 2026 at commit \texttt{d4f814c}. The last historically documented complete main-branch GitHub Actions suite preceded the Phase I report merge; any newer CI results should be cited only after successful run completion. Suggested commands: \texttt{make test}, \texttt{make test-bpu}, \texttt{make metrics test-p5-metrics}, and \texttt{make synth-all}. Recorded output files include \path{evidence/metrics/comparison_summary.csv}, \path{accuracy.csv} and \path{evidence/synthesis/summary.md}.
+Repository: \url{https://github.com/S-h-u-b-h-1/MCA}. The Phase II functional suite and report were rechecked on 20 November 2026. The post-route timing result is verified in GitHub Actions run \texttt{44777766230}, which retains source SHA-256 values, the mapped netlist, routed ASC and timing logs. This estimate uses a registered timing harness, not the raw BPU interface; verify the final merged main release CI independently. Suggested commands: \texttt{make test}, \texttt{make test-bpu}, \texttt{make metrics test-p5-metrics}, and \texttt{make synth-all}. Recorded output files include \path{evidence/metrics/comparison_summary.csv}, \path{accuracy.csv} and \path{evidence/synthesis/summary.md}.
 
 \begin{thebibliography}{00}
 \bibitem{repo} MCA Project 5 team, ``Dynamic Branch Prediction Unit: RTL, testbenches, traces and evidence,'' public project repository, Nov. 2026. [Online]. Available: \url{https://github.com/S-h-u-b-h-1/MCA}
+\bibitem{fpga} MCA Project 5 team, \emph{iCE40HX8K post-route FPGA Fmax study}, evidence checked 20 Nov. 2026. Repository: \url{https://github.com/S-h-u-b-h-1/MCA/blob/main/evidence/fpga_timing/POSTROUTE_RESULT.md}. Workflow: \url{https://github.com/S-h-u-b-h-1/MCA/actions/runs/44777766230}.
 \bibitem{faculty} Rishihood University, ``Modern Computer Architecture: Project 5---Dynamic Branch Prediction Unit,'' course project specification, 2026.
 \bibitem{smith} J. E. Smith, ``A Study of Branch Prediction Strategies,'' in \emph{Proc. 8th International Symposium on Computer Architecture (ISCA)}, 1981, pp. 135--148.
 \bibitem{lee} J. K. F. Lee and A. J. Smith, ``Analysis of Branch Prediction Strategies and Branch Target Buffer Design,'' University of California, Berkeley, Tech. Rep. UCB/CSD-83-121, Aug. 1983.
