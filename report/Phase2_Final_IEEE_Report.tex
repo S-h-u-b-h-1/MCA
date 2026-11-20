@@ -160,58 +160,52 @@ RTL top (independently synthesized) & Generic cells \\
 
 Each top was synthesized and checked separately under Yosys 0.33; the top counts must not be added together. The Phase I video shows a different local Yosys 0.70+post run with 2,907 generic cells for the integrated BPU. Differences between tool versions/flows are not a controlled cost comparison. The 2,993 figure in Table~\ref{tab:synthesis} refers exclusively to the pinned Yosys 0.33 evidence \cite{repo}. Neither result represents technology-mapped FPGA LUT utilization or maximum MHz.
 
-\subsection{Device-mapped software FPGA timing estimate}
-A separate timing experiment wraps the unchanged integrated BPU in synchronous
-input and observation registers, maps this registered harness
-to the Lattice \texttt{iCE40HX8K-CT256} using Yosys 0.33
-(\texttt{synth\_ice40}), and places/routes it with nextpnr-ice40 0.6
-using a 25~MHz requested clock target and placement seed one
-\cite{fpga}. The clock target is a design goal, not an assumed Fmax.
-The post-route frequency reported by nextpnr is \textbf{93.22~MHz}
-(estimated minimum period 10.73~ns), so the requested goal was met.
+\subsection{Mapped FPGA timing (software estimate)}
+We mapped the unchanged BPU in a registered-input/output wrapper to a
+Lattice iCE40HX8K-CT256 with Yosys 0.33 and nextpnr-ice40 0.6.
+With a requested 25~MHz clock goal and seed one, nextpnr reported a
+\textbf{93.22~MHz post-route estimate} (10.73~ns period); the goal
+was met \cite{fpga}. This is a clocked-harness timing estimate,
+not a physical board measurement.
 
 \begin{table}[t]
-\caption{Mapped FPGA resources: registered BPU harness on iCE40HX8K-CT256}
+\caption{FPGA resources and clock estimate for registered BPU harness}
 \label{tab:fpga}
 \centering
 \begin{tabular}{@{}lr@{}}
 \toprule
-Post-route software metric & Result \\
+Software post-route metric & Result \\
 \midrule
-Estimated clock Fmax & 93.22 MHz \\
-Estimated minimum period & 10.73 ns \\
-Requested clock target & 25.00 MHz (met) \\
-\texttt{SB\_LUT4} mapped LUTs & 427 \\
-\texttt{SB\_DFF*} flip-flops & 279 \\
-\texttt{SB\_CARRY} primitives & 56 \\
-\texttt{SB\_RAM40\_4K} blocks & 4 \\
+Estimated Fmax / period & 93.22 MHz / 10.73 ns \\
+Requested clock goal & 25.00 MHz (met) \\
+Mapped LUT4s / flip-flops & 427 / 279 \\
+Carry primitives / RAM40 blocks & 56 / 4 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The reported clock-domain critical path begins at BTB tag RAM, passes
-through BTB-hit/next-PC selection, and ends at a registered selected-next-PC
-observation output. The routing log attributes approximately 4.5~ns to
-logic and 6.3~ns to routing. Raw logs, the mapped netlist and source hashes
-were archived by GitHub Actions \cite{fpga}. The results are distinct
-from the earlier 2,993 generic Yosys cells for the raw BPU.
+The critical path runs from BTB tag RAM through lookup/next-PC
+selection into an observation register (about 4.5~ns logic plus
+6.3~ns routing). Detailed routing logs and source hashes are archived
+in the successful GitHub Actions run \cite{fpga}.
+
 
 \section{Limitations and Future Work}
-This is a prediction subsystem with simulation-based integration, not a complete IF--ID--EX--MEM--WB CPU. The study uses only three deterministic synthetic trace patterns and a defined cold-start condition. Its BHT is direct-indexed and untagged; the BTB is direct-mapped. An actual processor would supply prediction-metadata registers, execute-stage outcomes, instruction kills and measured instruction streams. The model excludes these components and cannot establish processor throughput or application speedup.
+The prototype is a prediction subsystem, not a full five-stage CPU.
+Accuracy uses three synthetic traces under cold-start conditions;
+neither measured processor CPI nor application speedup is established.
+An actual processor must manage prediction metadata, instruction
+kills, external clocking and realistic instruction streams.
 
-\textbf{Physical-board Fmax remains unmeasured.}
-Although this report includes a verified device-specific \emph{software}
-post-route estimate (Table~\ref{tab:fpga}), no FPGA board was programmed
-and no real laboratory clock measurement was made. The timing harness
-adds input/output capture registers; no board-specific PCF/pinout,
-external input arrival delays, output loads, voltage/temperature corners,
-or complete CPU integration are modeled. Consequently the 93.22~MHz
-estimate applies only to the registered harness and selected iCE40 timing
-model, not an arbitrary board or completed CPU. Course faculty must
-confirm whether this virtual-device result meets the original maximum-
-frequency requirement \cite{faculty}.
+\textbf{Physical-board Fmax remains unmeasured.} Our
+93.22~MHz estimate is specific to the registered harness and its
+iCE40 place-and-route timing model. No physical board was programmed,
+and no board PCF, external I/O delay or load constraints, or
+voltage/temperature corners were provided. University faculty must
+confirm whether this board-less study meets their Fmax requirement
+\cite{faculty}. Further work includes board-specific constraints,
+realistic pipeline integration and more representative traces.
 
-Future work can integrate the BPU into an actual five-stage pipeline, evaluate representative application traces, explore gshare/tournament predictors and BTB capacity tradeoffs, and perform device-specific power, area and timing analysis. The next step is a faculty-approved target/pinout timing flow, physical board validation and realistic pipeline integration instead of an assumed speedup.
 
 \balance
 \section{Individual Contributions}
@@ -222,10 +216,24 @@ Future work can integrate the BPU into an actual five-stage pipeline, evaluate r
 \textbf{Lakshya (P5):} synthesis automation, count/accuracy/CPI reconciliation, charts, technical report/video assembly. These contributions reflect the recorded repository artifacts and do not imply separate coauthor approval of this Phase II manuscript.
 
 \section{Conclusion}
-We designed and integrated a synthesizable branch-prediction subsystem that separates direction prediction, target lookup and recovery. Self-checking RTL verification covers state changes, BTB collisions, invalid updates and saved fetch-time metadata. Across 130 deterministic synthetic branch outcomes, the two-bit predictor achieves 42.31\% overall direction accuracy and 77.50\% on the loop-like trace, while an alternating counterexample demonstrates that higher complexity does not always improve prediction. Generic synthesis, illustrative CPI and a verified iCE40 post-route timing estimate quantify separate aspects of the prototype without claiming physical FPGA measurement or measured CPU performance. The next validation is faculty-approved board constraints and realistic pipeline integration.
+We built and verified a synthesizable direction/target prediction
+subsystem with saved-metadata recovery. The two-bit predictor achieved
+55/130 correct predictions overall (42.31\%) and 31/40 on the
+loop-like trace; strict alternation exposed a failure case.
+A separate registered-harness FPGA flow estimated 93.22~MHz
+post-route on iCE40HX8K-CT256, without asserting a physical-board
+clock, measured CPU CPI or application speedup.
+
 
 \section*{Reproducibility Note}
-Repository: \url{https://github.com/S-h-u-b-h-1/MCA}. The Phase II functional suite and report were rechecked on 20 November 2026. The post-route timing result is verified in GitHub Actions run \texttt{44777766230}, which retains source SHA-256 values, the mapped netlist, routed ASC and timing logs. This estimate uses a registered timing harness, not the raw BPU interface; verify the final merged main release CI independently. Suggested commands: \texttt{make test}, \texttt{make test-bpu}, \texttt{make metrics test-p5-metrics}, and \texttt{make synth-all}. Recorded output files include \path{evidence/metrics/comparison_summary.csv}, \path{accuracy.csv} and \path{evidence/synthesis/summary.md}.
+Source: \url{https://github.com/S-h-u-b-h-1/MCA}.
+The FPGA study was verified in GitHub Actions run
+\texttt{44777766230}, retaining the RTL hashes, mapped primitives,
+placed/routed design and timing logs. Reproduce with
+\texttt{make test-bpu}, \texttt{make test},
+\texttt{make metrics test-p5-metrics}, and
+\texttt{bash scripts/run\_fpga\_timing.sh}.
+
 
 \begin{thebibliography}{00}
 \bibitem{repo} MCA Project 5 team, ``Dynamic Branch Prediction Unit: RTL, testbenches, traces and evidence,'' public project repository, Nov. 2026. [Online]. Available: \url{https://github.com/S-h-u-b-h-1/MCA}
