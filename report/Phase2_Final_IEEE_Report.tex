@@ -21,7 +21,7 @@ MCA Project 5 \textbar{} Team: master-slave}}
 \maketitle
 
 \begin{abstract}
-Conditional branches introduce control hazards when the next fetch address must be selected before a branch resolves. We designed and verified a synthesizable Verilog branch prediction subsystem that combines a two-bit saturating-counter branch history table (BHT), a tagged branch target buffer (BTB), speculative next-program-counter selection and a misprediction recovery interface. The baseline study evaluates always-not-taken, one-bit and two-bit direction prediction on 130 dynamic branches from three deterministic synthetic traces. The two-bit predictor correctly predicts 55/130 branches (42.31\%) overall, compared with 48/130 (36.92\%) for always-not-taken and 47/130 (36.15\%) for one-bit prediction; on the loop trace it predicts 31/40 correctly (77.50\%). An independent Python reference model reconciles with the Verilog comparison. The integrated BPU has 140 documented directed verification checks across 16- and 32-entry configurations, and the committed Yosys 0.33 flow reports 2,993 generic cells for its integrated top. Reported CPI is analytical and assumption-based; a complete CPU, device-mapped resource utilization, maximum operating frequency and application speedup have not been measured.
+Conditional branches introduce control hazards when the next fetch address must be selected before a branch resolves. We designed and verified a synthesizable Verilog branch prediction subsystem that combines a two-bit saturating-counter branch history table (BHT), a tagged branch target buffer (BTB), speculative next-program-counter selection and a misprediction recovery interface. The baseline study evaluates always-not-taken, one-bit and two-bit direction prediction on 130 dynamic branches from three deterministic synthetic traces. The two-bit predictor correctly predicts 55/130 branches (42.31\%) overall, compared with 48/130 (36.92\%) for always-not-taken and 47/130 (36.15\%) for one-bit prediction; on the loop trace it predicts 31/40 correctly (77.50\%). An independent Python reference model reconciles with the Verilog comparison. The integrated BPU has 140 documented directed verification checks across 16- and 32-entry configurations, and the committed Yosys 0.33 flow reports 2,993 generic cells for its integrated top. Reported CPI is analytical and assumption-based. A separate registered-I/O iCE40HX8K-CT256 software place-and-route study estimates the BPU harness clock Fmax at 93.22~MHz; this is not a physical board measurement, CPU throughput or application speedup.
 \end{abstract}
 \begin{IEEEkeywords}
 branch prediction, branch history table, branch target buffer, Verilog, pipeline hazards, trace-driven verification
@@ -159,6 +159,42 @@ RTL top (independently synthesized) & Generic cells \\
 \end{table}
 
 Each top was synthesized and checked separately under Yosys 0.33; the top counts must not be added together. The Phase I video shows a different local Yosys 0.70+post run with 2,907 generic cells for the integrated BPU. Differences between tool versions/flows are not a controlled cost comparison. The 2,993 figure in Table~\ref{tab:synthesis} refers exclusively to the pinned Yosys 0.33 evidence \cite{repo}. Neither result represents technology-mapped FPGA LUT utilization or maximum MHz.
+
+\subsection{Device-mapped software FPGA timing estimate}
+A separate timing experiment wraps the unchanged integrated BPU in synchronous
+input and observation registers, maps this registered harness
+to the Lattice \texttt{iCE40HX8K-CT256} using Yosys 0.33
+(\texttt{synth\_ice40}), and places/routes it with nextpnr-ice40 0.6
+using a 25~MHz requested clock target and placement seed one
+\cite{fpga}. The clock target is a design goal, not an assumed Fmax.
+The post-route frequency reported by nextpnr is \textbf{93.22~MHz}
+(estimated minimum period 10.73~ns), so the requested goal was met.
+
+\begin{table}[t]
+\caption{Mapped FPGA resources: registered BPU harness on iCE40HX8K-CT256}
+\label{tab:fpga}
+\centering
+\begin{tabular}{@{}lr@{}}
+\toprule
+Post-route software metric & Result \\
+\midrule
+Estimated clock Fmax & 93.22 MHz \\
+Estimated minimum period & 10.73 ns \\
+Requested clock target & 25.00 MHz (met) \\
+\texttt{SB\_LUT4} mapped LUTs & 427 \\
+\texttt{SB\_DFF*} flip-flops & 279 \\
+\texttt{SB\_CARRY} primitives & 56 \\
+\texttt{SB\_RAM40\_4K} blocks & 4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The reported clock-domain critical path begins at BTB tag RAM, passes
+through BTB-hit/next-PC selection, and ends at a registered selected-next-PC
+observation output. The routing log attributes approximately 4.5~ns to
+logic and 6.3~ns to routing. Raw logs, the mapped netlist and source hashes
+were archived by GitHub Actions \cite{fpga}. The results are distinct
+from the earlier 2,993 generic Yosys cells for the raw BPU.
 
 \section{Limitations and Future Work}
 This is a prediction subsystem with simulation-based integration, not a complete IF--ID--EX--MEM--WB CPU. The study uses only three deterministic synthetic trace patterns and a defined cold-start condition. Its BHT is direct-indexed and untagged; the BTB is direct-mapped. An actual processor would supply prediction-metadata registers, execute-stage outcomes, instruction kills and measured instruction streams. The model excludes these components and cannot establish processor throughput or application speedup.
