@@ -1,4 +1,6 @@
-# FPGA Fmax study — method and acceptance criteria
+# FPGA Fmax study — method, verified result and acceptance criteria
+
+**Verified 20 Nov 2026:** software-estimated **93.22 MHz**, post-route path period **10.73 ns**, on a registered BPU timing harness mapped to **iCE40HX8K-CT256**. The 25 MHz requested goal was met. Mapped primitives: **427 LUT4**, **279 FF**, **56 carry**, **4 embedded RAM**. [Immutable run](https://github.com/S-h-u-b-h-1/MCA/actions/runs/44777766230); [pinned evidence summary](../evidence/fpga_timing/POSTROUTE_RESULT.md). This is **not** a physical board measurement. Faculty approval is still pending.
 
 This is a **new, board-less implementation study**. It does not change the
 original `rtl/branch_prediction_unit.v` or the P1–P4 prediction logic.
