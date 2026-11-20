@@ -25,7 +25,7 @@ jobs:
       - name: Install IEEE LaTeX build tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends latexmk texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-publishers poppler-utils
+          sudo apt-get install -y --no-install-recommends latexmk texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-publishers texlive-fonts-recommended poppler-utils
       - name: Decode and verify authored IEEEtran source
         run: |
           base64 --decode report/Phase2_Final_IEEE_Report.tex.gz.b64 | gzip -d > report/Phase2_Final_IEEE_Report.tex
