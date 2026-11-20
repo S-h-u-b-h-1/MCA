@@ -48,3 +48,12 @@ top. The BPU integration run [42200408998](https://github.com/S-h-u-b-h-1/MCA/ac
 
 Generic Yosys cells do not establish FPGA LUT counts or maximum clock MHz.
 The CPI figures are illustrative, not measured CPU speedup.
+
+## Phase II engineering verification — 20 November 2026
+
+- All original BHT, BTB, next-PC and recovery RTL remain unchanged by the new FPGA timing study.
+- The [device-mapped Lattice iCE40HX8K-CT256 registered-harness study](../evidence/fpga_timing/POSTROUTE_RESULT.md) used Yosys 0.33 and nextpnr-ice40 0.6. It completed place-and-route and estimated **93.22 MHz** Fmax (**10.73 ns**), meeting a specified 25 MHz timing goal.
+- Mapped resources were **427 LUT4s, 279 flip-flops, 56 carry cells and 4 RAM blocks**. They are FPGA primitives for the registered timing wrapper, **not** the 2,993 generic Yosys cells of the separately synthesized raw BPU.
+- The Phase II final [IEEE PDF](../report/Phase2_Final_IEEE_Report.pdf) and [LaTeX source](../report/Phase2_Final_IEEE_Report.tex) include the estimate, exact scope and hardware limitations.
+- This is a software post-route estimate, **not physically measured board frequency**. The university has not assigned a specific FPGA/pinout/timing-corner workflow or formally accepted this virtual target method. Details: [Phase II release status](PHASE2_RELEASE_STATUS.md).
+
